@@ -1,0 +1,21 @@
+# backend/.gitignore
+# Node.js dependencies
+node_modules/
+
+# Các thư mục build/output
+dist/
+build/
+
+# File cấu hình môi trường (nhạy cảm)
+*.env
+
+# File log
+*.log
+
+# Thư mục IDE/Editor
+.vscode/
+.idea/
+
+# Tạm thời: Swap files, Hệ thống tạm thời
+*.swp
+*.swo
