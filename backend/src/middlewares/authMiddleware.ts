@@ -1,25 +1,32 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import User, {IUser} from "../models/User";
+import User from "../models/User";
+import { AuthRequest } from "../types/customRequest";
 
-interface AuthRequest extends Request {
-    user?: IUser;
-}
+const protect = async (req: AuthRequest, res: any, next: NextFunction) => {
+    const token = req.headers.authorization?.split(" ")[1];
 
-const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
-    let token = req.headers.authorization;
+    if (!token) {
+        return res.status(401).json({ message: "Unauthorized, no token provided" });
+    }
 
-    if(token && token.startsWith("Bearer")){
-        try{
-            const decoded: any = jwt.verify(token.split(" ")[1], process.env.JWT_SECRET as string);
-            req.user = await User.findById(decoded.id).select("-password");
-            next();
-        } catch (error) {
-            res.status(401).json({ message: "Unauthorized, invalid token"});
+    try {
+        if (!process.env.JWT_SECRET) {
+            throw new Error("JWT_SECRET is not defined in environment variables");
         }
-    } else {
-        res.status(401).json({ message: "Unauthorized, no token"});
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET) as { id: string };
+
+        const user = await User.findById(decoded.id).select("-password");
+        if (!user) {
+            return res.status(401).json({ message: "Unauthorized, user not found" });
+        }
+
+        req.user = user;
+        next();
+    } catch (error) {
+        return res.status(401).json({ message: "Unauthorized, invalid token" });
     }
 };
 
-export {protect};
+export { protect };
