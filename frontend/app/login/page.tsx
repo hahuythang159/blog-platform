@@ -1,53 +1,48 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { login } from "../redux/authSlice";
-import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { setUser } from '@/app/store/userSlice';
+import { fetcher } from '@/app/utils/fetcher';
 
-export default function LoginPage() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const dispatch = useDispatch();
+const LoginPage = () => {
+  const [form, setForm] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
   const router = useRouter();
+  const dispatch = useDispatch();
 
-  const handleLogin = async () => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
-        username,
-        password,
+      const data = await fetcher('api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
       });
-      dispatch(login({ token: res.data.token, user: res.data.user }));
-      router.push("/");
-    } catch (error) {
-      console.error("Login failed", error);
+      dispatch(setUser({ token: data.token }));
+      
+      router.push('/posts');
+    } catch (err: any) {
+      setError(err.message);
     }
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto">
-      <h2 className="text-xl font-bold">Login</h2>
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        className="w-full p-2 border rounded"
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="w-full p-2 border rounded mt-2"
-      />
-      <button
-        onClick={handleLogin}
-        className="w-full bg-blue-500 text-white p-2 rounded mt-2"
-      >
-        Login
-      </button>
+    <div>
+      <h2>Login</h2>
+      {error && <p>{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <input name="email" type="email" placeholder="Email" onChange={handleChange} required />
+        <input name="password" type="password" placeholder="Password" onChange={handleChange} required />
+        <button type="submit">Login</button>
+      </form>
     </div>
   );
-}
+};
+
+export default LoginPage;
