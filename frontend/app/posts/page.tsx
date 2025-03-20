@@ -15,7 +15,7 @@ const PostListPage = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const data = await fetcher('api/posts');
+        const data = await fetcher('posts');
         dispatch(setPosts(data));
       } catch (error) {
         console.error(error);

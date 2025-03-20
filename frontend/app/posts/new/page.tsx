@@ -19,7 +19,7 @@ const CreatePostPage = () => {
     e.preventDefault();
     if (!user?.token) return alert('You must log in to continue!');
     try {
-      await fetcher('api/posts', {
+      await fetcher('posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${user.token}` },
         body: JSON.stringify(form),

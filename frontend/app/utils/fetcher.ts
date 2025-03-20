@@ -1,5 +1,5 @@
 export const fetcher = async (url: string, options?: RequestInit) => {
-  const res = await fetch(`http://localhost:5000/${url}`, options);
+  const res = await fetch(`http://localhost:5000/api/${url}`, options);
 
   if (res.status === 204) return null;
 

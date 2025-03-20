@@ -15,7 +15,7 @@ const EditPostPage = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const data = await fetcher(`api/posts/${id}`);
+        const data = await fetcher(`posts/${id}`);
         setForm({ title: data.title, content: data.content });
       } catch (error) {
         console.error(error);
@@ -32,7 +32,7 @@ const EditPostPage = () => {
     e.preventDefault();
     if (!user?.token) return alert('You must log in to continue!');
     try {
-      await fetcher(`api/posts/${id}`, {
+      await fetcher(`posts/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${user.token}` },
         body: JSON.stringify(form),

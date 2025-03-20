@@ -18,7 +18,7 @@ const PostDetailPage = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const data = await fetcher(`api/posts/${id}`);
+        const data = await fetcher(`posts/${id}`);
         dispatch(setPost(data));
       } catch (error) {
         console.error(error);
@@ -33,7 +33,7 @@ const PostDetailPage = () => {
       return
     }
     try {
-      const res = await fetcher(`api/posts/${id}`, {
+      const res = await fetcher(`posts/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${user.token}`,
