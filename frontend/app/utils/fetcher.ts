@@ -3,8 +3,15 @@ export const fetcher = async (url: string, options?: RequestInit) => {
 
   if (res.status === 204) return null;
 
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Something went wrong');
-  
-  return data;
+  try {
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || 'Something went wrong');
+    }
+
+    return data;
+  } catch (error) {
+    throw new Error('Failed to parse response as JSON');
+  }
 };
