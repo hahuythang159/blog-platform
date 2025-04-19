@@ -5,6 +5,7 @@ import connectDB from "././src/config/db"
 import authRoutes from "./src/routes/authRoutes"
 import postRouter from "./src/routes/postRoutes"
 import profileRoutes from "./src/routes/profileRoutes";
+import followRoutes from "./src/routes/followRoutes";
 
 dotenv.config();
 connectDB();
@@ -25,6 +26,8 @@ app.use('/api/posts', postRouter);
 app.use("/api/auth", authRoutes);
 
 app.use("/api/profile", profileRoutes);
+
+app.use("/api/follow", followRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
