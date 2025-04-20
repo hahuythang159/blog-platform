@@ -19,6 +19,8 @@ const UserProfilePage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+
 
   // Get the currently logged-in user from Redux
   const loggedInUser = useSelector((state: RootState) => state.user.user);
@@ -58,6 +60,44 @@ const UserProfilePage = () => {
     if (username) loadProfile();
   }, [username, loggedInUserId]);
 
+  // Function to handle when user presses "Follow" or "Unfollow" button
+  const handleToggleFollow = async () => {
+    if (!loggedInUserId || !profile) return;
+    setIsProcessing(true);
+
+    try {
+      const data = await fetcher(`follow/${username}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ followerId: loggedInUserId }),
+      });
+
+      // Update tracking status
+      setIsFollowing(data.following);
+
+      //Update followers count without re-fetching everything
+      setProfile((prev) => {
+        if (!prev) return prev;
+
+        const updatedFollowersCount = data.following
+          ? prev.followersCount + 1
+          : prev.followersCount - 1;
+
+        return {
+          ...prev,
+          followersCount: updatedFollowersCount,
+        };
+      });
+
+    } catch (error) {
+      console.error('Error toggling follow:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   if (loading) return <Box textAlign="center"><CircularProgress /></Box>;
   if (!profile) return <Typography>User not found</Typography>;
 
@@ -78,6 +118,23 @@ const UserProfilePage = () => {
         <Typography>➡️ Following: {profile.followingCount}</Typography>
         <Typography>📝 Posts: {profile.postCount}</Typography>
         {profile.gender && <Typography>🚻 Gender: {profile.gender}</Typography>}
+
+        {loggedInUser && loggedInUser.username !== profile.username && (
+          <Box sx={{ marginTop: 2 }}>
+            <Button
+              variant={isFollowing ? 'outlined' : 'contained'}
+              color="primary"
+              onClick={handleToggleFollow}
+              disabled={isProcessing}
+            >
+              {isProcessing
+                ? 'Processing...'
+                : isFollowing
+                  ? 'Unfollow'
+                  : 'Follow'}
+            </Button>
+          </Box>
+        )}
       </Box>
 
       {/* User Posts */}
@@ -85,7 +142,7 @@ const UserProfilePage = () => {
         <Typography variant="h6" gutterBottom>
           📝 Posts by {profile.username}
         </Typography>
-        
+
         {/* Show message if user has no posts */}
         {posts.length === 0 ? (
           <Typography variant="body2" color="text.secondary">
