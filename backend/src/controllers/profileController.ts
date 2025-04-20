@@ -75,3 +75,45 @@ export const checkIsFollowing = async (req: Request, res: any) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+export const getFollowers = async (req: Request, res: any) => {
+  const { username } = req.params;
+
+  try {
+    const user = await User.findOne({ username });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const profile = await Profile.findOne({ user: user._id }).populate({
+      path: 'followers',
+      select: 'username email avatar',
+    });
+
+    if (!profile) return res.status(404).json({ message: 'Profile not found' });
+
+    return res.status(200).json({ followers: profile.followers });
+  } catch (error) {
+    console.error('getFollowers error:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const getFollowing = async (req: Request, res: any) => {
+  const { username } = req.params;
+
+  try {
+    const user = await User.findOne({ username });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const profile = await Profile.findOne({ user: user._id }).populate({
+      path: 'following',
+      select: 'username email avatar',
+    });
+
+    if (!profile) return res.status(404).json({ message: 'Profile not found' });
+
+    return res.status(200).json({ following: profile.following });
+  } catch (error) {
+    console.error('getFollowing error:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
