@@ -3,6 +3,10 @@ import Profile from "../models/Profile";
 import Post from "../models/Post";
 import User from "../models/User";
 
+/**
+ * GET /api/profile/:username
+ * Get user's public profile information based on username.
+ */
 export const getPublicProfile = async (req: Request, res: any) => {
   try {
     const username = req.params.username;
@@ -36,6 +40,10 @@ export const getPublicProfile = async (req: Request, res: any) => {
   }
 };
 
+/**
+ * GET /api/profile/:username/posts
+ * Get a list of user posts by username.
+ */
 export const getUserPostsByUsername = async (req: Request, res: any) => {
   try {
     const username = req.params.username;
@@ -54,6 +62,11 @@ export const getUserPostsByUsername = async (req: Request, res: any) => {
   }
 };
 
+/**
+ * POST /api/follow/:username
+ * Check if a user (followerId) is following the user with username.
+ * followerId is passed via the query string (?following=abc).
+ */
 export const checkIsFollowing = async (req: Request, res: any) => {
   const { username } = req.params;
   const followerId = req.query.followerId as string;
@@ -76,6 +89,10 @@ export const checkIsFollowing = async (req: Request, res: any) => {
   }
 };
 
+/**
+ * GET /api/profile/:username/followers
+ * Get a list of a user's followers (based on their profile), along with some basic information.
+ */
 export const getFollowers = async (req: Request, res: any) => {
   const { username } = req.params;
 
@@ -85,7 +102,7 @@ export const getFollowers = async (req: Request, res: any) => {
 
     const profile = await Profile.findOne({ user: user._id }).populate({
       path: 'followers',
-      select: 'username email avatar',
+      select: 'username email avatar', // whatever you want
     });
 
     if (!profile) return res.status(404).json({ message: 'Profile not found' });
@@ -97,6 +114,10 @@ export const getFollowers = async (req: Request, res: any) => {
   }
 };
 
+/**
+ * GET /api/profile/:username/following
+ * Get a list of people the user is following.
+ */
 export const getFollowing = async (req: Request, res: any) => {
   const { username } = req.params;
 
