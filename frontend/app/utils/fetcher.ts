@@ -4,7 +4,10 @@ export const fetcher = async (url: string, options?: RequestInit) => {
   if (res.status === 204) return null;
 
   try {
-    const data = await res.json();
+    //Check if the response is in JSON format
+    const data = res.headers.get('content-type')?.includes('application/json')
+      ? await res.json() 
+      : { message: 'An unexpected error occurred' };
 
     if (!res.ok) {
       throw new Error(data.message || 'Something went wrong');
@@ -12,6 +15,6 @@ export const fetcher = async (url: string, options?: RequestInit) => {
 
     return data;
   } catch (error) {
-    throw new Error('Failed to parse response as JSON');
+    throw new Error(error instanceof Error ? error.message : 'Failed to parse response as JSON');
   }
 };
