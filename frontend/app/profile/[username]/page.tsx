@@ -2,14 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Container, Typography, Avatar, Box, CircularProgress, Card, CardContent, Divider, IconButton, Button } from '@mui/material';
+import {
+  Container, Typography, Avatar, Box, CircularProgress, Card, CardContent, Divider, IconButton, Button,
+  Tabs, Tab, List, ListItem, ListItemAvatar, ListItemText
+} from '@mui/material';
 import { fetcher } from '@/app/utils/fetcher';
 import Link from 'next/link';
 import { FavoriteBorder, ChatBubbleOutline } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store/store';
 import { Post, Profile } from '@/app/types';
-
+import { useMemo } from 'react';
 
 const UserProfilePage = () => {
 
@@ -20,6 +23,10 @@ const UserProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [tab, setTab] = useState<'followers' | 'following'>('followers');
+  const [followers, setFollowers] = useState<any[]>([]);
+  const [following, setFollowing] = useState<any[]>([]);
+  const [loadingList, setLoadingList] = useState(false);
 
 
   // Get the currently logged-in user from Redux
@@ -98,6 +105,51 @@ const UserProfilePage = () => {
     }
   };
 
+  const fetchFollowList = async (type: 'followers' | 'following') => {
+    setLoadingList(true);
+    try {
+      const res = await fetcher(`profile/${username}/${type}`);
+      if (type === 'followers') {
+        setFollowers(res.followers || []);
+      } else {
+        setFollowing(res.following || []);
+      }
+    } catch (err: any) {
+      console.error(`Error loading ${type}:`, err);
+    } finally {
+      setLoadingList(false);
+    }
+  };
+
+  useEffect(() => {
+    if (username) fetchFollowList(tab);
+  }, [tab, username]);
+
+  const renderFollowList = useMemo(() => {
+    const data = tab === 'followers' ? followers : following;
+
+    if (loadingList) return <Typography>Loading...</Typography>;
+    if (data.length === 0) return <Typography> No data available</Typography>;
+
+    return (
+      <List>
+        {data.map((user) => (
+          <Link key={user._id} href={`/profile/${user.username}`} passHref legacyBehavior>
+            <ListItem sx={{ cursor: 'pointer' }}>
+              <ListItemAvatar>
+                <Avatar src={user.avatar} />
+              </ListItemAvatar>
+              <ListItemText
+                primary={user.username}
+              />
+            </ListItem>
+          </Link>
+        ))}
+      </List>
+    );
+  }, [tab, followers, following, loadingList]);
+
+
   if (loading) return <Box textAlign="center"><CircularProgress /></Box>;
   if (!profile) return <Typography>User not found</Typography>;
 
@@ -135,6 +187,25 @@ const UserProfilePage = () => {
             </Button>
           </Box>
         )}
+      </Box>
+      <Box sx={{ marginTop: 5 }}>
+        <Typography variant="h6" gutterBottom>
+          📋 List Follow
+        </Typography>
+
+        <Tabs
+          value={tab}
+          onChange={(e, newValue) => setTab(newValue)}
+          indicatorColor="primary"
+          textColor="primary"
+        >
+          <Tab value="followers" label={`Follower (${followers.length})`} />
+          <Tab value="following" label={`Following (${following.length})`} />
+        </Tabs>
+
+        <Box sx={{ marginTop: 2 }}>
+          {renderFollowList}
+        </Box>
       </Box>
 
       {/* User Posts */}
