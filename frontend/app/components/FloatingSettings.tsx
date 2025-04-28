@@ -8,6 +8,7 @@ import { logout } from '../store/userSlice';
 import { useRouter } from 'next/navigation';
 import type { PopoverOrigin } from '@mui/material';
 import SettingsMenu from './SettingsMenu';
+import { toggleTheme } from '../store/themeSlice';
 
 const popoverAnchorOrigin: PopoverOrigin = { vertical: 'top', horizontal: 'left' };
 const popoverTransformOrigin: PopoverOrigin = { vertical: 'bottom', horizontal: 'right' };
@@ -30,6 +31,11 @@ const FloatingSettings = () => {
         router.push('/login');
     };
 
+    // Handler function for toggling the theme between light and dark modes
+    const handleToggleTheme = () => {
+        dispatch(toggleTheme());
+    }
+
     return (
         <>
             {/* Floating Action Button (FAB) that triggers the Popover on click */}
@@ -48,9 +54,10 @@ const FloatingSettings = () => {
                 transformOrigin={popoverTransformOrigin}
                 sx={{ mt: 1 }}
             >
-                {/* Settings Menu inside the Popover, passing the logout handler as a prop */}
+                {/* Settings Menu inside the Popover, passing the logout, toggle Theme handler as a prop */}
                 <SettingsMenu
                     onLogout={handleLogout}
+                    onToggleTheme={handleToggleTheme}
                 />
             </Popover>
         </>
