@@ -8,6 +8,7 @@ import { fetcher } from '@/app/utils/fetcher';
 import Link from 'next/link';
 import { Container, Typography, Button, Box, Card, CardContent, Avatar, IconButton, Divider } from '@mui/material';
 import { MoreHoriz, FavoriteBorder, ChatBubbleOutline } from '@mui/icons-material';
+import FloatingSettings from '../components/FloatingSettings';
 
 const PostListPage = () => {
   const dispatch = useDispatch();
@@ -99,6 +100,7 @@ const PostListPage = () => {
           </Card>
         ))}
       </Box>
+      <FloatingSettings/>
     </Container>
   );
 };
