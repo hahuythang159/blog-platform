@@ -44,8 +44,7 @@ export const toggleFollow = async (req: Request, res: any) => {
     await followerProfile.save();
 
     return res.status(200).json({ following: !isAlreadyFollowing });
-  } catch (error) {
-    console.error("toggleFollow error:", error);
-    return res.status(500).json({ message: "Server error" });
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message || 'Internal server error' });
   }
 };

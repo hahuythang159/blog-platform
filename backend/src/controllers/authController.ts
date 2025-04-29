@@ -35,9 +35,8 @@ export const registerUser = async (req: Request, res: Response): Promise<any> =>
       await profile.save();
   
       return res.status(201).json({ message: "User registered successfully" });
-    } catch (error) {
-      console.error("Register error:", error);
-      return res.status(500).json({ message: "Something went wrong", error });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message || 'Internal server error' });
     }
   };
   

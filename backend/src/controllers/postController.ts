@@ -7,9 +7,8 @@ export const getPost = async (req: AuthRequest, res: Response) => {
     try {
         const posts = await Post.find().populate("author", "username");
         res.json(posts);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error" });
+    } catch (error: any) {
+        return res.status(500).json({ message: error.message || 'Internal server error' });
     }
 };
 
@@ -19,9 +18,8 @@ export const getPostById = async (req: AuthRequest, res: any) => {
         const post = await Post.findById(req.params.id).populate("author", "username");
         if (!post) return res.status(404).json({ message: "Post not found" });
         res.json(post);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error" });
+    } catch (error: any) {
+        return res.status(500).json({ message: error.message || 'Internal server error' });
     }
 };
 
@@ -36,9 +34,8 @@ export const createPost = async (req: AuthRequest, res: any) => {
         const newPost = new Post({ title, content, author: req.user.id });
         await newPost.save();
         res.status(201).json(newPost);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error" });
+    } catch (error: any) {
+        return res.status(500).json({ message: error.message || 'Internal server error' });
     }
 };
 
@@ -60,9 +57,8 @@ export const updatePost = async (req: AuthRequest, res: any) => {
         await post.save();
 
         res.json(post);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error" });
+    } catch (error: any) {
+        return res.status(500).json({ message: error.message || 'Internal server error' });
     }
 };
 
@@ -78,8 +74,7 @@ export const deletePost = async (req: AuthRequest, res: any) => {
 
         await post.deleteOne();
         res.status(200).json({ message: "Post deleted successfully"});
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error" });
+    } catch (error: any) {
+        return res.status(500).json({ message: error.message || 'Internal server error' });
     }
 };

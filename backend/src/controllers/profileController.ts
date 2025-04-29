@@ -34,9 +34,8 @@ export const getPublicProfile = async (req: Request, res: any) => {
     };
 
     return res.status(200).json(publicProfile);
-  } catch (error) {
-    console.error("getPublicProfile error:", error);
-    res.status(500).json({ message: "Server error" });
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message || 'Internal server error' });
   }
 };
 
@@ -56,9 +55,8 @@ export const getUserPostsByUsername = async (req: Request, res: any) => {
       .lean();
 
     return res.status(200).json(posts);
-  } catch (error) {
-    console.error("getUserPostsByUsername error:", error);
-    res.status(500).json({ message: "Server error" });
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message || 'Internal server error' });
   }
 };
 
@@ -83,9 +81,8 @@ export const checkIsFollowing = async (req: Request, res: any) => {
     );
 
     return res.status(200).json({ isFollowing });
-  } catch (error) {
-    console.error("checkIsFollowing error:", error);
-    return res.status(500).json({ message: "Server error" });
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message || 'Internal server error' });
   }
 };
 
@@ -108,9 +105,8 @@ export const getFollowers = async (req: Request, res: any) => {
     if (!profile) return res.status(404).json({ message: 'Profile not found' });
 
     return res.status(200).json({ followers: profile.followers });
-  } catch (error) {
-    console.error('getFollowers error:', error);
-    return res.status(500).json({ message: 'Server error' });
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message || 'Internal server error' });
   }
 };
 
@@ -133,8 +129,7 @@ export const getFollowing = async (req: Request, res: any) => {
     if (!profile) return res.status(404).json({ message: 'Profile not found' });
 
     return res.status(200).json({ following: profile.following });
-  } catch (error) {
-    console.error('getFollowing error:', error);
-    return res.status(500).json({ message: 'Server error' });
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message || 'Internal server error' });
   }
 };
