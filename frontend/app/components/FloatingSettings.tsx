@@ -36,6 +36,12 @@ const FloatingSettings = () => {
         dispatch(toggleTheme());
     }
 
+    // Handler for navigating to the account settings page
+    const handleAccountSettings = () => {
+        setAnchorEl(null);
+        router.push('/account/settings');
+    }
+
     return (
         <>
             {/* Floating Action Button (FAB) that triggers the Popover on click */}
@@ -58,6 +64,7 @@ const FloatingSettings = () => {
                 <SettingsMenu
                     onLogout={handleLogout}
                     onToggleTheme={handleToggleTheme}
+                    onAccountSettings={handleAccountSettings}
                 />
             </Popover>
         </>
