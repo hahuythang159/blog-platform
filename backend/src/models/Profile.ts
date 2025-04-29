@@ -8,7 +8,6 @@ export interface IProfile extends Document {
   followers: Types.ObjectId[];
   following: Types.ObjectId[];
   location?: string;
-  website?: string;
   birthday?: Date;
 }
 
@@ -24,7 +23,6 @@ const ProfileSchema: Schema = new Schema(
     followers: [{ type: Schema.Types.ObjectId, ref: "User", default: [] }],
     following: [{ type: Schema.Types.ObjectId, ref: "User", default: [] }],
     location: { type: String },
-    website: { type: String },
     birthday: { type: Date },
   },
   {
