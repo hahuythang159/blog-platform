@@ -1,15 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { jwtDecode } from 'jwt-decode';
-
-interface User {
-  id: string,
-  username: string,
-  token: string,
-}
-
-interface UserState {
-  user: User | null
-}
+import { UserState } from '../interfaces/userState';
 
 const token = typeof window !== "undefined" ? localStorage.getItem('token'): null;
 const decodedToken: any = token ? jwtDecode(token) : null;
@@ -23,7 +14,6 @@ const initialState: UserState = {
   }
   : null,
 };
-
 
 const userSlice = createSlice({
   name: 'user',

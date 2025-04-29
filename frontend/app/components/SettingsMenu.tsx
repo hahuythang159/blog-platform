@@ -4,17 +4,7 @@ import { List, ListItem, ListItemIcon, ListItemText, ListItemButton } from '@mui
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
-
-interface SettingsMenuProps {
-  // onLogout function passed as a prop to handle logout logic
-  onLogout: () => void;
-
-  // onToggleTheme function passed as a prop to toggle dark/light theme
-  onToggleTheme: () => void;
-
-  // prop for navigating to the Account Settings page
-  onAccountSettings: () => void;
-}
+import { SettingsMenuProps } from '../interfaces/settingsMenu';
 
 const SettingsMenu = ({ onLogout, onToggleTheme, onAccountSettings }: SettingsMenuProps) => {
 
