@@ -17,7 +17,7 @@ export const getMyProfile = async (req: AuthRequest, res: Response): Promise<voi
       return;
     }
 
-    // Tìm profile
+    // Find profile
     const profile = await Profile.findOne({ user: user._id }).lean();
 
     const myProfile = {
@@ -64,9 +64,15 @@ export const updateProfile = async (req: AuthRequest, res: Response): Promise<an
       return res.status(404).json({ message: "Profile not found" });
     }
 
+    // Update the profile fields
+    incomingFields.forEach(fields => {
+      // Type-safe assignment
+      (profile as any)[fields] = req.body[fields];
+    });
+
     await profile.save();
 
-    return res.status(200).json({ message: "Profile updated successfully" });
+    return res.status(200).json({ message: "Profile updated successfully",profile });
   } catch (error: any) {
     return res.status(500).json({ message: error.message || 'Internal server error' });
   }
