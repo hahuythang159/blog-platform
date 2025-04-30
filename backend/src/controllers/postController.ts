@@ -5,7 +5,16 @@ import Post from "../models/Post";
 // Get list of Posts
 export const getPost = async (req: AuthRequest, res: Response): Promise<any> => {
     try {
-        const posts = await Post.find().populate("author", "username");
+        const posts = await Post.find()
+            .populate({
+                path: 'author',
+                select: 'username profile',
+                populate: {
+                    path: 'profile',
+                    select: 'avatar'
+                }
+            });
+
         res.json(posts);
     } catch (error: any) {
         return res.status(500).json({ message: error.message || 'Internal server error' });
