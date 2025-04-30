@@ -27,7 +27,8 @@ const UserProfilePage = () => {
   const [followers, setFollowers] = useState<any[]>([]);
   const [following, setFollowing] = useState<any[]>([]);
   const [loadingList, setLoadingList] = useState(false);
-
+  
+  const avatarUrl = useMemo(() => (profile ? `${process.env.NEXT_PUBLIC_API_URL}${profile.avatar}` : ''), [profile]);
 
   // Get the currently logged-in user from Redux
   const loggedInUser = useSelector((state: RootState) => state.user.user);
@@ -99,7 +100,7 @@ const UserProfilePage = () => {
       });
 
     } catch (error) {
-      console.error('Error toggling follow:', error);
+      alert('Error toggling follow!');
     } finally {
       setIsProcessing(false);
     }
@@ -115,7 +116,7 @@ const UserProfilePage = () => {
         setFollowing(res.following || []);
       }
     } catch (err: any) {
-      console.error(`Error loading ${type}:`, err);
+      alert('Error loading!');
     } finally {
       setLoadingList(false);
     }
@@ -134,7 +135,7 @@ const UserProfilePage = () => {
     return (
       <List>
         {data.map((user) => (
-          <Link key={user._id} href={`/profile/${user.username}`} passHref legacyBehavior>
+          <Link key={user.userId} href={`/profile/${user.username}`} passHref legacyBehavior>
             <ListItem sx={{ cursor: 'pointer' }}>
               <ListItemAvatar>
                 <Avatar src={user.avatar} />
@@ -157,7 +158,7 @@ const UserProfilePage = () => {
     <Container maxWidth="sm" sx={{ paddingY: 4 }}>
       {/* Profile Info Section */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Avatar src={profile.avatar} sx={{ width: 80, height: 80 }} />
+      <Avatar src={avatarUrl} sx={{ width: 80, height: 80 }} />
         <Box>
           <Typography variant="h5">{profile.username}</Typography>
           <Typography variant="body2" color="text.secondary">{profile.bio || 'No bio yet'}</Typography>
