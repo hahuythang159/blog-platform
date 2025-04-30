@@ -11,7 +11,7 @@ export const getPost = async (req: AuthRequest, res: Response): Promise<any> => 
                 select: 'username profile',
                 populate: {
                     path: 'profile',
-                    select: 'avatar'
+                    select: 'avatarData avatarType'
                 }
             });
 
