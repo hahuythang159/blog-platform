@@ -18,3 +18,16 @@ export const fetcher = async (url: string, options?: RequestInit) => {
     throw new Error(error instanceof Error ? error.message : 'Failed to parse response as JSON');
   }
 };
+
+// Returning the raw response without additional data processing (such as converting to JSON or text).
+export const rawFetcher = (url: string, options: RequestInit = {}) => {
+  const token = localStorage.getItem('token');
+
+  return fetch(`http://localhost:5000/api/${url}`, {
+    ...options,
+    headers: {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
