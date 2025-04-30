@@ -21,11 +21,13 @@ export const getPublicProfile = async (req: Request, res: any) => {
     // Find profile
     const profile = await Profile.findOne({ user: user._id }).lean();
 
+    const avatarExists = profile?.avatarData && profile?.avatarType;
+
     // But still fallback if for some reason the profile does not exist yet
     const publicProfile = {
       userId: user._id,
       username: user.username,
-      avatar: profile?.avatar ?? "",
+      avatar: avatarExists ? `/api/user/avatar/${user._id}` : "",
       bio: profile?.bio ?? "",
       gender: profile?.gender ?? "prefer_not_to_say",
       followersCount: profile?.followers?.length ?? 0,
@@ -97,18 +99,35 @@ export const getFollowers = async (req: Request, res: any) => {
     const user = await User.findOne({ username });
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    const profile = await Profile.findOne({ user: user._id }).populate({
-      path: 'followers',
-      select: 'username email avatar', // whatever you want
-    });
-
+    const profile = await Profile.findOne({ user: user._id });
     if (!profile) return res.status(404).json({ message: 'Profile not found' });
 
-    return res.status(200).json({ followers: profile.followers });
+    // Lấy followers (list ObjectId)
+    const followers = await User.find({ _id: { $in: profile.followers } });
+
+    // Lấy avatar từ Profile tương ứng
+    const enrichedFollowers = await Promise.all(
+      followers.map(async (follower) => {
+        const followerProfile = await Profile.findOne({ user: follower._id }).lean();
+        const avatarUrl = followerProfile?.avatarData
+          ? `/api/user/avatar/${follower._id}`
+          : '';
+
+        return {
+          userId: follower._id,
+          username: follower.username,
+          email: follower.email,
+          avatar: avatarUrl,
+        };
+      })
+    );
+
+    return res.status(200).json({ followers: enrichedFollowers });
   } catch (error: any) {
     return res.status(500).json({ message: error.message || 'Internal server error' });
   }
 };
+
 
 /**
  * GET /api/profile/:username/following
@@ -121,14 +140,28 @@ export const getFollowing = async (req: Request, res: any) => {
     const user = await User.findOne({ username });
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    const profile = await Profile.findOne({ user: user._id }).populate({
-      path: 'following',
-      select: 'username email avatar',
-    });
-
+    const profile = await Profile.findOne({ user: user._id });
     if (!profile) return res.status(404).json({ message: 'Profile not found' });
 
-    return res.status(200).json({ following: profile.following });
+    const following = await User.find({ _id: { $in: profile.following } });
+
+    const enrichedFollowing = await Promise.all(
+      following.map(async (followedUser) => {
+        const followedProfile = await Profile.findOne({ user: followedUser._id }).lean();
+        const avatarUrl = followedProfile?.avatarData
+          ? `/api/user/avatar/${followedUser._id}`
+          : '';
+
+        return {
+          userId: followedUser._id,
+          username: followedUser.username,
+          email: followedUser.email,
+          avatar: avatarUrl,
+        };
+      })
+    );
+
+    return res.status(200).json({ following: enrichedFollowing });
   } catch (error: any) {
     return res.status(500).json({ message: error.message || 'Internal server error' });
   }

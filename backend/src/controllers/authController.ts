@@ -32,7 +32,6 @@ export const registerUser = async (req: Request, res: Response): Promise<any> =>
     // Create Profile object with user._id
     const profile = new Profile({
       user: user._id,
-      avatar: "",
       bio: "",
       gender: "prefer_not_to_say",
       followers: [],
@@ -45,11 +44,12 @@ export const registerUser = async (req: Request, res: Response): Promise<any> =>
     user.profile = profile._id as Types.ObjectId;
     await user.save();
 
-    return res.status(201).json({ message: "User registered successfully"});
+    return res.status(201).json({ message: "User registered successfully" });
   } catch (error: any) {
     return res.status(500).json({ message: error.message || 'Internal server error' });
   }
 };
+
 export const loginUser = async (req: Request, res: Response): Promise<any> => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });

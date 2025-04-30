@@ -4,6 +4,7 @@ import Post from "../models/Post";
 import { AuthRequest } from "../types/customRequest";
 import { getAuthUserId } from "../utils/getAuthUserId";
 import mongoose from "mongoose";
+import { upload } from "../middlewares/multerConfig";
 
 /**
  * GET /api/user/me
@@ -20,11 +21,13 @@ export const getMyProfile = async (req: AuthRequest, res: Response): Promise<voi
     // Find profile
     const profile = await Profile.findOne({ user: user._id }).lean();
 
+    const avatarExists = profile?.avatarData && profile?.avatarType;
+
     const myProfile = {
       userId: user._id,
       username: user.username,
       email: user.email,
-      avatar: profile?.avatar ?? "",
+      avatar: avatarExists ? `/api/user/avatar/${user._id}` : "",
       bio: profile?.bio ?? "",
       gender: profile?.gender ?? "prefer_not_to_say",
       birthday: profile?.birthday ?? null,
@@ -42,15 +45,16 @@ export const getMyProfile = async (req: AuthRequest, res: Response): Promise<voi
 
 /**
  * PUT /api/user/update
- * Update current user's profile (bio, avatar, birthday, gender, location)
+ * Update current user's profile (bio, birthday, gender, location)
  */
 export const updateProfile = async (req: AuthRequest, res: Response): Promise<any> => {
   try {
     const userId = getAuthUserId(req);
-    const allowedFields = ['bio', 'avatar', 'birthday', 'gender', 'location'];
-    const incomingFields = Object.keys(req.body);
+    const allowedFields = ['bio', 'birthday', 'gender', 'location'];
 
     // Validate fields
+    const incomingFields = Object.keys(req.body).filter(field => allowedFields.includes(field));
+
     const invalidFields = incomingFields.filter(field => !allowedFields.includes(field));
     if (invalidFields.length > 0) {
       return res.status(400).json({
@@ -72,7 +76,7 @@ export const updateProfile = async (req: AuthRequest, res: Response): Promise<an
 
     await profile.save();
 
-    return res.status(200).json({ message: "Profile updated successfully",profile });
+    return res.status(200).json({ message: "Profile updated successfully" });
   } catch (error: any) {
     return res.status(500).json({ message: error.message || 'Internal server error' });
   }
@@ -145,3 +149,56 @@ export const unfollowUser = async (req: AuthRequest, res: Response): Promise<any
   }
 };
 
+/**
+ * GET /api/user/avatar/:userId
+ * Trả về ảnh avatar từ MongoDB Buffer
+ */
+export const getUserAvatar = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { userId } = req.params;
+    const profile = await Profile.findOne({ user: userId });
+
+    if (!profile || !profile.avatarData || !profile.avatarType) {
+      res.status(204).send();
+      return;
+    }
+
+    res.set("Content-Type", profile.avatarType);
+    res.send(profile.avatarData);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message || "Internal server error" });
+  }
+};
+
+/**
+ * POST /api/user/upload-avatar
+ * Lưu ảnh avatar vào DB dưới dạng Buffer
+ */
+export const uploadAvatar = [
+  upload.single("avatar"),
+  async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const file = req.file;
+      if (!file) {
+        res.status(400).json({ message: "No file uploaded" });
+        return;
+      }
+
+      const userId = getAuthUserId(req);
+      const profile = await Profile.findOne({ user: userId });
+
+      if (!profile) {
+        res.status(404).json({ message: "Profile not found" });
+        return;
+      }
+
+      profile.avatarData = file.buffer;
+      profile.avatarType = file.mimetype;
+      await profile.save();
+
+      res.status(200).json({ message: "Avatar uploaded successfully" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message || "Internal server error" });
+    }
+  }
+];
