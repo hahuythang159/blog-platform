@@ -95,14 +95,6 @@ const ProfileForm = ({ profile, setProfile }: Props) => {
         <MenuItem value="other">Other</MenuItem>
         <MenuItem value="prefer_not_to_say">Don't want to reveal</MenuItem>
       </TextField>
-      <TextField
-        label="Location"
-        name="location"
-        value={profile.location}
-        onChange={handleChange}
-        fullWidth
-        sx={{ mb: 2 }}
-      />
       <Button variant="contained" type="submit" fullWidth disabled={saving}>
         {saving ? 'Saving...' : 'Save changes'}
       </Button>

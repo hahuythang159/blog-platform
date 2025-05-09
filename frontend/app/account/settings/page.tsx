@@ -12,7 +12,6 @@ const AccountSettingsPage = () => {
     avatar: '',
     birthday: '',
     gender: 'prefer_not_to_say',
-    location: '',
   });
 
   const [loading, setLoading] = useState(true);

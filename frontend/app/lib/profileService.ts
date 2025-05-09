@@ -19,7 +19,6 @@ export const getProfile = async (): Promise<ProfileData | null> => {
             avatar: avatarUrl,
             birthday: data.birthday?.split('T')[0] || '',
             gender: data.gender,
-            location: data.location,
         };
     } catch (error) {
         alert('Failed to load profile. Please try again later.');
