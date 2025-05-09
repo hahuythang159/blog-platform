@@ -1,4 +1,6 @@
-import mongoose, {Schema, Document} from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
+import applyPostCascadeDelete from "../middlewares/postCascadeDelete";
+import { applyPostVirtuals } from "./virtuals/post.virtuals";
 
 export interface IPost extends Document {
     title: string;
@@ -10,13 +12,15 @@ export interface IPost extends Document {
 
 const PostSchema = new Schema<IPost>(
     {
-        title: {type: String, required: true},
-        content: {type: String, required: true},
-        author: {type: Schema.Types.ObjectId, ref: "User", required: true },
+        title: { type: String, required: true },
+        content: { type: String, required: true },
+        author: { type: Schema.Types.ObjectId, ref: "User", required: true },
     },
     {
         timestamps: true
     }
 )
+applyPostVirtuals(PostSchema);
+applyPostCascadeDelete(PostSchema);
 
 export default mongoose.model<IPost>("Post", PostSchema);
