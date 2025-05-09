@@ -5,6 +5,7 @@ import { AuthRequest } from "../types/customRequest";
 import { getAuthUserId } from "../utils/getAuthUserId";
 import mongoose from "mongoose";
 import { upload } from "../middlewares/multerConfig";
+import User from "../models/User";
 
 /**
  * GET /api/user/me
@@ -78,6 +79,38 @@ export const updateProfile = async (req: AuthRequest, res: Response): Promise<an
     return res.status(200).json({ message: "Profile updated successfully" });
   } catch (error: any) {
     return res.status(500).json({ message: error.message || 'Internal server error' });
+  }
+};
+
+/**
+ * DELETE /api/user/delete
+ * Delete a user account.
+ * Requires authentication.
+ * 
+ * Path parameters:
+ * - userId: string   // ID of the user to delete
+ * 
+ * Authorization:
+ * Only the authenticated user can delete their own account.
+ * 
+ * Response:
+ * 200 OK with success message, or 404 if user not found, or 500 for server error.
+ */
+export const deleteUserAccount = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = getAuthUserId(req);
+
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ message: "User does not exist" });
+      return;
+    }
+
+    await user.deleteOne(); // middleware will handle the rest
+
+    res.status(200).json({ message: "Your Account deleted successfully" });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message || "Internal server error" });
   }
 };
 
