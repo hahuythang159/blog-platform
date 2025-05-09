@@ -21,16 +21,38 @@ export const getPost = async (req: AuthRequest, res: Response): Promise<any> => 
     }
 };
 
-// Get Post Details
+// Get Post Details with Comments
 export const getPostById = async (req: AuthRequest, res: Response): Promise<any> => {
     try {
-        const post = await Post.findById(req.params.id).populate("author", "username");
-        if (!post) return res.status(404).json({ message: "Post not found" });
+        const post = await Post.findById(req.params.id)
+            .populate({
+                path: "author",
+                select: "username profile",
+                populate: {
+                    path: "profile",
+                    select: "avatarData avatarType"
+                }
+            })
+            .populate({
+                path: "comments",
+                populate: {
+                    path: "author",
+                    select: "username profile",
+                    populate: {
+                        path: "profile",
+                        select: "avatarData avatarType"
+                    }
+                }
+            });
+
+        if (!post) return res.status(404).json({ message: "Post does not exist" });
+
         res.json(post);
     } catch (error: any) {
         return res.status(500).json({ message: error.message || 'Internal server error' });
     }
 };
+
 
 // Create a new Post
 export const createPost = async (req: AuthRequest, res: Response): Promise<any> => {
