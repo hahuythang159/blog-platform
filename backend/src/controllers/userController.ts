@@ -31,7 +31,6 @@ export const getMyProfile = async (req: AuthRequest, res: Response): Promise<voi
       bio: profile?.bio ?? "",
       gender: profile?.gender ?? "prefer_not_to_say",
       birthday: profile?.birthday ?? null,
-      location: profile?.location ?? "",
       followersCount: profile?.followers?.length ?? 0,
       followingCount: profile?.following?.length ?? 0,
       postCount: await Post.countDocuments({ author: user._id }),
@@ -45,12 +44,12 @@ export const getMyProfile = async (req: AuthRequest, res: Response): Promise<voi
 
 /**
  * PUT /api/user/update
- * Update current user's profile (bio, birthday, gender, location)
+ * Update current user's profile (bio, birthday, gender)
  */
 export const updateProfile = async (req: AuthRequest, res: Response): Promise<any> => {
   try {
     const userId = getAuthUserId(req);
-    const allowedFields = ['bio', 'birthday', 'gender', 'location'];
+    const allowedFields = ['bio', 'birthday', 'gender'];
 
     // Validate fields
     const incomingFields = Object.keys(req.body).filter(field => allowedFields.includes(field));
