@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { removePost, setPost } from '@/app/store/postSlice';
 import { RootState } from '@/app/store/store';
 import { fetcher } from '@/app/utils/fetcher';
 import { useParams, useRouter } from 'next/navigation';
+import PostCommentList from '@/app/components/PostCommentList';
+import { Comment } from '@/app/interfaces/comments';
 
 const PostDetailPage = () => {
   const dispatch = useDispatch();
@@ -14,12 +16,14 @@ const PostDetailPage = () => {
   const postId = id as string;
   const post = useSelector((state: RootState) => state.post.post);
   const user = useSelector((state: RootState) => state.user.user);
+  const [comments, setComments] = useState<Comment[]>([]);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
         const data = await fetcher(`posts/${id}`);
         dispatch(setPost(data));
+        setComments(data.comments || []);
       } catch (error) {
         console.error(error);
       }
@@ -40,7 +44,7 @@ const PostDetailPage = () => {
           'Content-Type': 'application/json',
         },
       });
-      
+
       //Case status 204 No Content
       if (res === null) {
         dispatch(removePost(postId));
@@ -58,22 +62,36 @@ const PostDetailPage = () => {
     }
   };
 
-  if (!post) return <p>Loading...</p>;
+  const handleDeleteComment = (commentId: string) => {
+    setComments(prev => prev.filter(c => c._id !== commentId));
+  };
+  const handleAddComment = (newComment: Comment) => {
+    setComments(prev => [newComment, ...prev]);
+  };
 
-  
+
+  if (!post) return <p>Loading...</p>;
 
   return (
     <div>
       <h2>{post.title}</h2>
       <p>{post.content}</p>
       <p>Author: {post.author.username}</p>
+
       {user && post.author.username === user.username && (
         <>
           <button onClick={() => router.push(`/posts/edit/${id}`)}>Edit</button>
           <button onClick={handleDelete}>Delete</button>
         </>
       )}
+      <PostCommentList
+        comments={comments}
+        postId={postId}
+        onDelete={handleDeleteComment}
+        onAdd={handleAddComment}
+      />
     </div>
+
   );
 };
 
