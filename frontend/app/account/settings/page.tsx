@@ -5,6 +5,7 @@ import { Box, Typography, CircularProgress } from '@mui/material';
 import { getProfile } from '@/app/lib/profileService';
 import ProfileForm from './ProfileForm';
 import { ProfileData } from '@/app/interfaces/profileData';
+import DeleteAccountButton from './DeleteAccountButton';
 
 const AccountSettingsPage = () => {
   const [profile, setProfile] = useState<ProfileData>({
@@ -39,6 +40,9 @@ const AccountSettingsPage = () => {
         Account Setting
       </Typography>
       <ProfileForm profile={profile} setProfile={setProfile} />
+      <Box sx={{ mt: 4 }}>
+        <DeleteAccountButton />
+      </Box>
     </Box>
   );
 };
