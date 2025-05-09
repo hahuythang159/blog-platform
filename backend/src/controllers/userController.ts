@@ -86,10 +86,6 @@ export const updateProfile = async (req: AuthRequest, res: Response): Promise<an
  * DELETE /api/user/delete
  * Delete a user account.
  * Requires authentication.
- * 
- * Path parameters:
- * - userId: string   // ID of the user to delete
- * 
  * Authorization:
  * Only the authenticated user can delete their own account.
  * 

@@ -102,10 +102,10 @@ export const getFollowers = async (req: Request, res: any) => {
     const profile = await Profile.findOne({ user: user._id });
     if (!profile) return res.status(404).json({ message: 'Profile not found' });
 
-    // Lấy followers (list ObjectId)
+    // Get followers (list ObjectId)
     const followers = await User.find({ _id: { $in: profile.followers } });
 
-    // Lấy avatar từ Profile tương ứng
+    // Get avatar from corresponding Profile
     const enrichedFollowers = await Promise.all(
       followers.map(async (follower) => {
         const followerProfile = await Profile.findOne({ user: follower._id }).lean();
