@@ -48,7 +48,7 @@ export const createComment = async (req: AuthRequest, res: Response): Promise<an
 };
 
 /**
- * GET /api/comments/:postId/
+ * GET /api/comments/post/:postId/
  * Get all comments for a specific post.
  * 
  * Path parameters:
@@ -68,15 +68,19 @@ export const getCommentsByPost = async (req: AuthRequest, res: Response): Promis
         const comments = await Comment.find({ post: postId })
             .populate({
                 path: "author",
-                select: "username profile",
-                populate: {
-                    path: "profile",
-                    select: "avatarData avatarType",
-                },
+                select: "username",
             })
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .lean();
+
+        comments.map((comment: any) => {
+            const authorId = comment.author?._id;
+            comment.author.avatarUrl = `/api/users/${authorId}/avatar`;
+            return comment;
+        });
 
         res.json(comments);
+
     } catch (err: any) {
         res.status(500).json({ message: err.message || "Server error" });
     }
