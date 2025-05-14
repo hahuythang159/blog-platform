@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Avatar, Card, CardContent, Divider, IconButton, Typography } from '@mui/material';
-import Link from 'next/link';
+import { Avatar, Card, CardContent, Divider, IconButton, Typography, Box } from '@mui/material';
 import { ChatBubbleOutline, FavoriteBorder, MoreHoriz } from '@mui/icons-material';
 import { getAvatarUrl } from '../lib/avatarService';
+import { calculateTimeAgo } from '../utils/timeUtils';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const PostCard = ({ post }: { post: any }) => {
     const [avatarUrl, setAvatarUrl] = useState('');
+    const [timeAgo, setTimeAgo] = useState('');
+    const router = useRouter();
 
     useEffect(() => {
         const loadAvatar = async () => {
@@ -13,16 +17,24 @@ const PostCard = ({ post }: { post: any }) => {
             setAvatarUrl(url);
         };
         loadAvatar();
-    }, [post.author._id]);
+
+        // Use the calculate Time Ago function from the utils file
+        setTimeAgo(calculateTimeAgo(post.createdAt));
+    }, [post.createdAt]);
+
+    // Navigate to post details
+    const handleNavigateToPost = () => {
+        router.push(`/posts/${post._id}`);
+    };
 
     return (
-        <Card sx={{ borderRadius: '16px', boxShadow: 3 }}>
+        <Card sx={{ borderRadius: '16px', boxShadow: 3, marginBottom: 2, overflow: 'hidden' }}>
             <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
                 <Link href={`/profile/${post.author.username}`} passHref>
                     <Avatar
                         alt={post.author.username}
                         src={avatarUrl}
-                        sx={{ width: 40, height: 40, marginRight: 2, cursor: 'pointer' }}
+                        sx={{ width: 40, height: 40, marginRight: 2 }}
                     />
                 </Link>
                 <Link href={`/profile/${post.author.username}`} passHref style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -30,20 +42,25 @@ const PostCard = ({ post }: { post: any }) => {
                         {post.author.username}
                     </Typography>
                 </Link>
+                <Box sx={{ flexGrow: 1 }} />
+                <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
+                    {timeAgo}
+                </Typography>
                 <IconButton>
                     <MoreHoriz />
                 </IconButton>
             </CardContent>
 
-            <CardContent>
-                <Typography variant="h6" component="div" sx={{ fontWeight: 600, marginBottom: 1 }}>
-                    <Link href={`/posts/${post._id}`} passHref>
-                        {post.title}
-                    </Link>
+            <CardContent sx={{ cursor: 'pointer' }} onClick={handleNavigateToPost}>
+                <Typography
+                    variant="h6"
+                    sx={{ fontWeight: 600, marginBottom: 1, fontSize: '1.2rem', lineHeight: 1.4 }}
+                >
+                    {post.title}
                 </Typography>
 
-                <Typography variant="body2" color="text.secondary" noWrap>
-                    {post.content.length > 100 ? post.content.substring(0, 100) + '...' : post.content}
+                <Typography variant="body2" color="text.secondary">
+                    {post.content.length > 100 ? post.content.slice(0, 100) + '...' : post.content}
                 </Typography>
             </CardContent>
 
@@ -52,7 +69,7 @@ const PostCard = ({ post }: { post: any }) => {
                 <IconButton>
                     <FavoriteBorder />
                 </IconButton>
-                <IconButton>
+                <IconButton component="button" onClick={() => router.push(`/posts/${post._id}`)}>
                     <ChatBubbleOutline />
                 </IconButton>
             </CardContent>
