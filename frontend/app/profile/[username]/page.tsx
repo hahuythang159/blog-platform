@@ -13,11 +13,13 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store/store';
 import { Post, Profile } from '@/app/types';
 import { useMemo } from 'react';
+import { checkFollowingStatus, getFollowList, getProfilePublic, getUserPosts } from '@/app/api/profile';
+import { calculateTimeAgo } from '@/app/utils/timeUtils';
 
 const UserProfilePage = () => {
 
   // Get the username from the URL (dynamic route)
-  const { username } = useParams();
+  const { username } = useParams<{ username: string }>();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +29,7 @@ const UserProfilePage = () => {
   const [followers, setFollowers] = useState<any[]>([]);
   const [following, setFollowing] = useState<any[]>([]);
   const [loadingList, setLoadingList] = useState(false);
-  
+
   const avatarUrl = useMemo(() => (profile ? `${process.env.NEXT_PUBLIC_API_URL}${profile.avatar}` : ''), [profile]);
 
   // Get the currently logged-in user from Redux
@@ -39,8 +41,8 @@ const UserProfilePage = () => {
     const loadProfile = async () => {
       try {
         const [profileData, postsData] = await Promise.all([
-          fetcher(`profile/${username}`),
-          fetcher(`profile/${username}/posts`)
+          getProfilePublic(username),
+          getUserPosts(username),
         ]);
 
         setProfile(profileData);
@@ -48,7 +50,7 @@ const UserProfilePage = () => {
 
         // Check if logged-in user is following this profile
         if (loggedInUserId && loggedInUser.username !== profileData.username) {
-          const followRes = await fetcher(`profile/${username}/is-following?followerId=${loggedInUserId}`);
+          const followRes = await await checkFollowingStatus(username, loggedInUserId);
 
           if (!followRes) {
             throw new Error('No follow data returned');
@@ -109,7 +111,7 @@ const UserProfilePage = () => {
   const fetchFollowList = async (type: 'followers' | 'following') => {
     setLoadingList(true);
     try {
-      const res = await fetcher(`profile/${username}/${type}`);
+      const res = await getFollowList(username, type);
       if (type === 'followers') {
         setFollowers(res.followers || []);
       } else {
@@ -158,7 +160,7 @@ const UserProfilePage = () => {
     <Container maxWidth="sm" sx={{ paddingY: 4 }}>
       {/* Profile Info Section */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-      <Avatar src={avatarUrl} sx={{ width: 80, height: 80 }} />
+        <Avatar src={avatarUrl} sx={{ width: 80, height: 80 }} />
         <Box>
           <Typography variant="h5">{profile.username}</Typography>
           <Typography variant="body2" color="text.secondary">{profile.bio || 'No bio yet'}</Typography>
@@ -224,13 +226,22 @@ const UserProfilePage = () => {
           // Loop through and render user's posts
           posts.map((post) => (
             <Card key={post._id} sx={{ borderRadius: 2, marginBottom: 2 }}>
-              <CardContent>
+              <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'left' }}>
+                  {calculateTimeAgo(post.createdAt)}
+                </Typography>
+
                 {/* Post title with link to full post */}
                 <Typography
                   variant="h6"
                   component={Link}
                   href={`/posts/${post._id}`}
-                  sx={{ fontWeight: 600, textDecoration: 'none', color: 'inherit' }}
+                  sx={{
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    color: 'inherit',
+                    marginBottom: 1,
+                  }}
                 >
                   {post.title}
                 </Typography>
@@ -243,7 +254,9 @@ const UserProfilePage = () => {
               <Divider />
               <CardContent sx={{ display: 'flex', justifyContent: 'space-between', paddingTop: 1 }}>
                 <IconButton><FavoriteBorder /></IconButton>
-                <IconButton><ChatBubbleOutline /></IconButton>
+                <IconButton component={Link} href={`/posts/${post._id}`}>
+                  <ChatBubbleOutline />
+                </IconButton>
               </CardContent>
             </Card>
           ))
