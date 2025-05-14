@@ -8,12 +8,15 @@ export const getPost = async (req: AuthRequest, res: Response): Promise<any> => 
         const posts = await Post.find()
             .populate({
                 path: 'author',
-                select: 'username profile',
-                populate: {
-                    path: 'profile',
-                    select: 'avatarData avatarType'
-                }
-            });
+                select: 'username',
+            })
+            .lean();
+
+        posts.map((post: any) => {
+            const authorId = post.author?._id;
+            post.author.avatarUrl = `/api/users/${authorId}/avatar`;
+            return post;
+        });
 
         res.json(posts);
     } catch (error: any) {
@@ -30,7 +33,7 @@ export const getPostById = async (req: AuthRequest, res: Response): Promise<any>
                 select: "username profile",
                 populate: {
                     path: "profile",
-                    select: "avatarData avatarType"
+                    select: "_id"
                 }
             })
             .populate({
@@ -40,7 +43,7 @@ export const getPostById = async (req: AuthRequest, res: Response): Promise<any>
                     select: "username profile",
                     populate: {
                         path: "profile",
-                        select: "avatarData avatarType"
+                        select: "_id"
                     }
                 }
             });
@@ -52,7 +55,6 @@ export const getPostById = async (req: AuthRequest, res: Response): Promise<any>
         return res.status(500).json({ message: error.message || 'Internal server error' });
     }
 };
-
 
 // Create a new Post
 export const createPost = async (req: AuthRequest, res: Response): Promise<any> => {
