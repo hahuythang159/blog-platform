@@ -33,18 +33,9 @@ export const getAvatarUrl = async (userId: string): Promise<string> => {
             },
         });
 
-        if (!response.ok) {
-            if (response.status === 404) {
-                alert('Avatar not found for userId');
-                return '';
-            }
-            alert('Failed to fetch avatar for userId');
-            return '';
-        }
         const avatarBlob = await response.blob();
         return URL.createObjectURL(avatarBlob);
     } catch (error) {
-        alert('Failed to fetch avatar for userId');
         return '';
     }
 };

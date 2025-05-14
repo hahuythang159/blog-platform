@@ -1,14 +1,38 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { deleteComment, createComment } from '../lib/commentsService';
 import { RootState } from '../store/store';
-import { CommentListProps } from '../interfaces/CommentListProps';
+import { CommentListProps } from '../interfaces/commentListProps';
+import { getAvatarUrl } from '../lib/avatarService';
 
 const PostCommentList: React.FC<CommentListProps> = ({ comments, onDelete, onAdd, postId }) => {
   const user = useSelector((state: RootState) => state.user.user);
   const currentUserId = user?.id;
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
+  const [avatarUrls, setAvatarUrls] = useState<{ [userId: string]: string }>({});
+
+  useEffect(() => {
+    const loadAvatars = async () => {
+      const newAvatars: { [userId: string]: string } = {};
+
+      await Promise.all(
+        comments.map(async (comment) => {
+          const userId = comment.author._id;
+          if (!avatarUrls[userId]) {
+            const url = await getAvatarUrl(userId);
+            if (url) newAvatars[userId] = url;
+          }
+        })
+      );
+
+      setAvatarUrls((prev) => ({ ...prev, ...newAvatars }));
+    };
+
+    if (comments.length > 0) {
+      loadAvatars();
+    }
+  }, [comments]);
 
   const handleDelete = async (commentId: string) => {
     if (!user?.token) return alert('Please log in');
@@ -50,13 +74,11 @@ const PostCommentList: React.FC<CommentListProps> = ({ comments, onDelete, onAdd
         <div key={comment._id} style={{ borderBottom: '1px solid #ccc', marginBottom: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              {comment.author.profile?.avatarData && (
-                <img
-                  src={`data:${comment.author.profile.avatarType};base64,${comment.author.profile.avatarData}`}
-                  alt="avatar"
-                  style={{ width: 30, height: 30, borderRadius: '50%', marginRight: 8 }}
-                />
-              )}
+              <img
+                src={avatarUrls[comment.author._id]}
+                alt="avatar"
+                style={{ width: 30, height: 30, borderRadius: '50%', marginRight: 8 }}
+              />
               <strong>{comment.author.username}</strong>
             </div>
             {comment.author._id === currentUserId && (
