@@ -2,6 +2,7 @@ import { Schema } from "mongoose";
 import Post from "../models/Post";
 import Comment from "../models/Comment";
 import Profile from "../models/Profile";
+import PostStats from "../models/PostStats";
 
 /**
  * Middleware for User: Delete posts, comments, profiles,
@@ -11,7 +12,10 @@ const applyUserCascadeDelete = (UserSchema: Schema) => {
     UserSchema.pre("deleteOne", { document: true, query: false }, async function (next) {
         const userId = this._id;
         try {
+            const userPosts = await Post.find({ author: userId }).select("_id");
+            const postIds = userPosts.map(post => post._id);
             await Post.deleteMany({ author: userId });
+            await PostStats.deleteMany({ post: { $in: postIds } });
             await Comment.deleteMany({ author: userId });
             await Profile.deleteOne({ user: userId });
 
