@@ -8,6 +8,9 @@ import { fetcher } from '@/app/utils/fetcher';
 import { useParams, useRouter } from 'next/navigation';
 import PostCommentList from '@/app/components/PostCommentList';
 import { Comment } from '@/app/interfaces/comments';
+import { usePostStats } from '@/app/hooks/usePostStats';
+import { useViewTracker } from '@/app/hooks/useViewTracker';
+import LikeButton from '@/app/components/Post/LikeButton';
 
 const PostDetailPage = () => {
   const dispatch = useDispatch();
@@ -17,6 +20,9 @@ const PostDetailPage = () => {
   const post = useSelector((state: RootState) => state.post.post);
   const user = useSelector((state: RootState) => state.user.user);
   const [comments, setComments] = useState<Comment[]>([]);
+  const { stats, setStats } = usePostStats(postId);
+
+  useViewTracker(postId);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -73,6 +79,7 @@ const PostDetailPage = () => {
   if (!post) return <p>Loading...</p>;
 
   return (
+
     <div>
       <h2>{post.title}</h2>
       <p>{post.content}</p>
@@ -83,6 +90,13 @@ const PostDetailPage = () => {
           <button onClick={() => router.push(`/posts/edit/${id}`)}>Edit</button>
           <button onClick={handleDelete}>Delete</button>
         </>
+      )}
+
+      {stats && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <p>Views: {stats.views}</p>
+          <LikeButton postId={postId} likedBy={stats.likes} setStats={setStats} />
+        </div>
       )}
       <PostCommentList
         comments={comments}

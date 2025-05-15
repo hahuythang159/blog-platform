@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Avatar, Card, CardContent, Divider, IconButton, Typography, Box } from '@mui/material';
-import { ChatBubbleOutline, FavoriteBorder, MoreHoriz } from '@mui/icons-material';
+import { ChatBubbleOutline, MoreHoriz } from '@mui/icons-material';
 import { getAvatarUrl } from '../lib/avatarService';
 import { calculateTimeAgo } from '../utils/timeUtils';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { usePostStats } from '../hooks/usePostStats';
+import LikeButton from './Post/LikeButton';
 
 const PostCard = ({ post }: { post: any }) => {
     const [avatarUrl, setAvatarUrl] = useState('');
     const [timeAgo, setTimeAgo] = useState('');
     const router = useRouter();
+    const { stats, setStats } = usePostStats(post._id);
 
     useEffect(() => {
         const loadAvatar = async () => {
@@ -66,9 +69,7 @@ const PostCard = ({ post }: { post: any }) => {
 
             <Divider />
             <CardContent sx={{ display: 'flex', justifyContent: 'space-between', paddingTop: 1 }}>
-                <IconButton>
-                    <FavoriteBorder />
-                </IconButton>
+                <LikeButton postId={post._id} likedBy={stats?.likes || []} setStats={setStats} />
                 <IconButton component="button" onClick={() => router.push(`/posts/${post._id}`)}>
                     <ChatBubbleOutline />
                 </IconButton>
