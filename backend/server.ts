@@ -8,6 +8,7 @@ import profileRoutes from "./src/routes/profileRoutes";
 import followRoutes from "./src/routes/followRoutes";
 import userRoutes from "./src/routes/userRoutes";
 import commentRoutes from "./src/routes/commentRoutes";
+import postStatsRoutes from "./src/routes/postStatsRoutes";
 
 dotenv.config();
 connectDB();
@@ -34,6 +35,8 @@ app.use("/api/follow", followRoutes);
 app.use("/api/user", userRoutes);
 
 app.use("/api/comments", commentRoutes);
+
+app.use("/api/post-stats", postStatsRoutes)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
