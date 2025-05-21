@@ -21,16 +21,8 @@ export const uploadAvatar = async (file: File): Promise<string> => {
 // API call to get user avatar
 export const getAvatarUrl = async (userId: string): Promise<string> => {
     try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('No token found.');
-        }
-
         const response = await rawFetcher(`user/avatar/${userId}`, {
             method: 'GET',
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
         });
 
         const avatarBlob = await response.blob();
