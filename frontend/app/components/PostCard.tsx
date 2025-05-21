@@ -6,7 +6,7 @@ import { calculateTimeAgo } from '../utils/timeUtils';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { usePostStats } from '../hooks/usePostStats';
-import LikeButton from './Post/LikeButton';
+import LikeButton from './post/LikeButton';
 
 const PostCard = ({ post }: { post: any }) => {
     const [avatarUrl, setAvatarUrl] = useState('');

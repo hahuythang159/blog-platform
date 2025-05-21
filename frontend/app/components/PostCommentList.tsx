@@ -7,7 +7,7 @@ import { getAvatarUrl } from '../lib/avatarService';
 
 const PostCommentList: React.FC<CommentListProps> = ({ comments, onDelete, onAdd, postId }) => {
   const user = useSelector((state: RootState) => state.user.user);
-  const currentUserId = user?.id;
+  const currentUserId = user?._id;
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [avatarUrls, setAvatarUrls] = useState<{ [userId: string]: string }>({});

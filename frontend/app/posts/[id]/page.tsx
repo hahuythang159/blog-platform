@@ -10,7 +10,7 @@ import PostCommentList from '@/app/components/PostCommentList';
 import { Comment } from '@/app/interfaces/comments';
 import { usePostStats } from '@/app/hooks/usePostStats';
 import { useViewTracker } from '@/app/hooks/useViewTracker';
-import LikeButton from '@/app/components/Post/LikeButton';
+import LikeButton from '@/app/components/post/LikeButton';
 
 const PostDetailPage = () => {
   const dispatch = useDispatch();

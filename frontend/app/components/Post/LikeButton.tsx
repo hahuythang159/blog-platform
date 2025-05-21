@@ -14,7 +14,7 @@ import { useSelector } from 'react-redux';
 import { useToggleLike } from '@/app/hooks/useToggleLike';
 import { RootState } from '@/app/store/store';
 import { useRouter } from 'next/navigation';
-import { LikeButtonProps } from '@/app/types/LikeButtonProps';
+import { LikeButtonProps } from '@/app/types/likeButtonProps';
 
 const LikeButton = ({ postId, likedBy, setStats }: LikeButtonProps) => {
     const user = useSelector((state: RootState) => state.user.user);
@@ -22,7 +22,7 @@ const LikeButton = ({ postId, likedBy, setStats }: LikeButtonProps) => {
     const { toggleLike, isLiking } = useToggleLike(postId, user?.token || '');
     const [showPrompt, setShowPrompt] = useState(false);
 
-    const isLiked = likedBy?.some(u => u._id === user?.id);
+    const isLiked = likedBy?.some(u => u._id === user?._id);
 
     const handleClick = async () => {
         if (!user) {

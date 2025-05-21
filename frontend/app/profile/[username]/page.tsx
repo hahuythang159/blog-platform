@@ -34,7 +34,7 @@ const UserProfilePage = () => {
 
   // Get the currently logged-in user from Redux
   const loggedInUser = useSelector((state: RootState) => state.user.user);
-  const loggedInUserId = loggedInUser?.id;
+  const loggedInUserId = loggedInUser?._id;
 
   useEffect(() => {
     // Load profile and posts for the user when the component mounts or username changes

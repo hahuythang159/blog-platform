@@ -9,7 +9,7 @@ const decodedToken: any = token ? jwtDecode(token) : null;
 const initialState: UserState = {
   user: token 
   ? {
-    id: decodedToken?.id,
+    _id: decodedToken?._id,
     username: decodedToken?.username,
     token,
   }
@@ -26,7 +26,7 @@ const userSlice = createSlice({
       try{
         const decode: any = jwtDecode(token);
         state.user = {
-          id: decode.id,
+          _id: decode._id,
           username: decode.username,
           token,
         };
