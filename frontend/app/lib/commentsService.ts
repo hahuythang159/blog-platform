@@ -1,9 +1,10 @@
 import { CreateCommentPayload } from "../interfaces/commentPayload";
 import { Comment } from "../interfaces/comments";
 import { fetcher, rawFetcher } from "../utils/fetcher";
+import { getToken } from "../utils/token";
 
 export async function createComment(payload: CreateCommentPayload): Promise<Comment> {
-    const token = localStorage.getItem('token');
+    const token = getToken();
   
     const data = await fetcher('comments', {
       method: 'POST',

@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { jwtDecode } from 'jwt-decode';
 import { UserState } from '../interfaces/userState';
+import { getToken } from '../utils/token';
 
-const token = typeof window !== "undefined" ? localStorage.getItem('token'): null;
+const token = typeof window !== "undefined" ? getToken(): null;
 const decodedToken: any = token ? jwtDecode(token) : null;
 
 const initialState: UserState = {

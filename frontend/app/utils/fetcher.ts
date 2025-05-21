@@ -1,3 +1,5 @@
+import { getToken } from "./token";
+
 export const fetcher = async (url: string, options?: RequestInit) => {
   const res = await fetch(`http://localhost:5000/api/${url}`, options);
 
@@ -21,7 +23,7 @@ export const fetcher = async (url: string, options?: RequestInit) => {
 
 // Returning the raw response without additional data processing (such as converting to JSON or text).
 export const rawFetcher = (url: string, options: RequestInit = {}) => {
-  const token = localStorage.getItem('token');
+  const token = getToken();
 
   return fetch(`http://localhost:5000/api/${url}`, {
     ...options,

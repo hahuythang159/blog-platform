@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ThemeState } from '../interfaces/theme';
 import { ThemeMode } from '../types/themeMode';
+import { getToken } from '../utils/token';
 
-const savedTheme = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
+const savedTheme = typeof window !== 'undefined' ? getToken() : null;
 const initialState: ThemeState = {
   mode: savedTheme === 'dark' ? 'dark' : 'light',
 };

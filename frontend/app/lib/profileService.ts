@@ -1,9 +1,10 @@
 import { ProfileData } from '@/app/interfaces/profileData';
 import { fetcher } from '@/app/utils/fetcher';
 import { getAvatarUrl } from './avatarService';
+import { getToken } from '../utils/token';
 
 export const getProfile = async (): Promise<ProfileData | null> => {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     try {
         const data = await fetcher('user/me', {
             method: 'GET',
@@ -27,7 +28,7 @@ export const getProfile = async (): Promise<ProfileData | null> => {
 };
 
 export const updateProfile = async (profile: ProfileData): Promise<boolean> => {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     try {
         await fetcher('user/update', {
             method: 'PUT',

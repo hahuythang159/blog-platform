@@ -1,7 +1,9 @@
 import { fetcher } from "../utils/fetcher";
+import { getToken } from "../utils/token";
 
 export const deleteUserAccount = async (): Promise<boolean> => {
-    const token = localStorage.getItem('token');
+    const token = getToken();
+
     try {
         await fetcher('user/delete', {
             method: 'DELETE',
