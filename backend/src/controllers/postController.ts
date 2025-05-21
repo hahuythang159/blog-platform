@@ -14,7 +14,7 @@ export const getPost = async (req: AuthRequest, res: Response): Promise<any> => 
 
         posts.map((post: any) => {
             const authorId = post.author?._id;
-            post.author.avatarUrl = `/api/users/${authorId}/avatar`;
+            post.author.avatarUrl = `/api/user/avatar/${authorId}`;
             return post;
         });
 
