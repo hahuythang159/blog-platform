@@ -9,6 +9,9 @@ import followRoutes from "./src/routes/followRoutes";
 import userRoutes from "./src/routes/userRoutes";
 import commentRoutes from "./src/routes/commentRoutes";
 import postStatsRoutes from "./src/routes/postStatsRoutes";
+import adminRoutes from "./src/routes/adminRoutes";
+
+import { createDefaultAdmin } from "./src/seeds/initAdmin";
 
 dotenv.config();
 connectDB();
@@ -22,7 +25,7 @@ if (!process.env.JWT_SECRET) {
 }
 
 app.get("/", (req, res) => {
-    res.status(201).json({ message: "Server is up and running successfully!"});
+    res.status(201).json({ message: "Server is up and running successfully!" });
 })
 app.use('/api/posts', postRouter);
 
@@ -38,5 +41,10 @@ app.use("/api/comments", commentRoutes);
 
 app.use("/api/post-stats", postStatsRoutes)
 
+app.use("/api/admin", adminRoutes);
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+connectDB().then(async () => {
+    await createDefaultAdmin();
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+});
