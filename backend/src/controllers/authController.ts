@@ -4,6 +4,7 @@ import User from "../models/User";
 import generateToken from "../utils/generateToken";
 import Profile from "../models/Profile";
 import { Types } from "mongoose";
+import Ban from "../models/Ban";
 
 export const registerUser = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -50,13 +51,31 @@ export const registerUser = async (req: Request, res: Response): Promise<any> =>
   }
 };
 
+
 export const loginUser = async (req: Request, res: Response): Promise<any> => {
   const { email, password } = req.body;
+
   const user = await User.findOne({ email });
 
-  if (user && (await bcrypt.compare(password, user.password))) {
-    return res.json({ token: generateToken(user.id, user.username) });
-  } else {
+  if (!user) {
     return res.status(401).json({ message: "Invalid credentials" });
   }
-}
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
+
+  const activeBan = await Ban.findOne({ user: user._id, isActive: true });
+
+  if (activeBan) {
+    return res.status(403).json({
+      message: "Your account has been banned",
+      reason: activeBan.reason || "No reason provided.",
+    });
+  }
+
+  return res.status(200).json({
+    token: generateToken(user.id, user.username),
+  });
+};
