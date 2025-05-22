@@ -1,6 +1,6 @@
 import express from "express";
 import { isAdmin } from "../middlewares/isAdmin";
-import { getAllUsers } from "../controllers/admin/userAdmin";
+import { getAllUsers, toggleBanUser } from "../controllers/admin/userAdmin";
 import { getSystemStats, getTopPosts } from "../controllers/admin/statsAdmin";
 import { protect } from "../middlewares/authMiddleware";
 import { getPost } from "../controllers/postController";
@@ -13,5 +13,6 @@ router.get("/users", getAllUsers);
 router.get("/stats", getSystemStats);
 router.get("/stats/top-posts", getTopPosts);
 router.get("/posts", getPost);
+router.patch("/users/:userId/ban", protect, isAdmin, toggleBanUser);
 
 export default router;
