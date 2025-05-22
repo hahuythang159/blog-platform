@@ -14,13 +14,23 @@ import BentoCard from "../components/admin/BentoCard";
 import { ToggleBanParams } from "../interfaces/toggleBan";
 import TopPosts from "../components/admin/TopPosts";
 import UserModal from "../components/admin/UserModal";
+import { useAdminAuth } from "../hooks/useAdminAuth";
 
 export default function AdminDashboardPage() {
+  const isAuthorized = useAdminAuth();
   const [stats, setStats] = useState<Stats | null>(null);
   const [topPosts, setTopPosts] = useState<any[]>([]);
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Block API calls if not authenticated
+  useEffect(() => {
+    if (!isAuthorized) return;
+
+    getSystemStats().then(setStats);
+    getTopPosts().then(setTopPosts);
+  }, [isAuthorized]);
 
   const handleToggleBan = async (
     { userId, isBanned, username }: ToggleBanParams
@@ -68,11 +78,6 @@ export default function AdminDashboardPage() {
     }
   };
 
-  useEffect(() => {
-    getSystemStats().then(setStats);
-    getTopPosts().then(setTopPosts);
-  }, []);
-
   const handleOpenUserModal = async () => {
     const userData = await getUserList();
     setUsers(userData);
@@ -80,6 +85,9 @@ export default function AdminDashboardPage() {
   };
 
   const handleCloseUserModal = () => setUserModalOpen(false);
+
+  // ⛔ Do not render anything without verifying permissions
+  if (!isAuthorized) return null;
 
   return (
     <Box sx={{ p: 4 }}>
