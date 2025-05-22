@@ -12,4 +12,6 @@ export interface Post {
     };
   };
   comments?: Comment[];
+  views: number;
+  likes: string[];
 }

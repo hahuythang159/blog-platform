@@ -3,4 +3,7 @@ export interface User {
     email?: string,
     username: string,
     token: string,
+    activeBan?: {
+        reason: string;
+    };
 }
