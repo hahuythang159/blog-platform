@@ -1,34 +1,33 @@
 import { Request, Response } from "express";
 import User from "../../models/User";
-import Profile from "../../models/Profile";
 import { AuthRequest } from "../../types/customRequest";
 import Ban from "../../models/Ban";
 
 /** 
  * GET /api/admin/users
- * Get a list of all users with their basic details (username, email) and profile information (avatar).
+ * Get a list of all users with their basic details (username, email) and activeBa
  * 
  * Response:
- * - 200 OK with an array of users, including username, email, and avatar (if available).
+ * - 200 OK with an array of users, including username, email and activeBa (if available).
  * - 500 Internal Server Error if the operation fails.
  */
-export const getAllUsers = async (req: Request, res: Response) => {
+export const getAllUsers = async (req: Request, res: Response): Promise<any> => {
     try {
         const users = await User.find().select("username email").lean();
+        const usersWithDetails = [];
 
-        const usersWithProfile = await Promise.all(
-            users.map(async (user: any) => {
-                const profile = await Profile.findOne({ user: user._id });
-                return {
-                    ...user,
-                    avatar: profile?.avatarData ? `/api/user/avatar/${user._id}` : "",
-                };
-            })
-        );
+        for (const user of users) {
+            const activeBan = await Ban.findOne({ user: user._id, isActive: true }).select("reason");
 
-        res.status(200).json(usersWithProfile);
+            usersWithDetails.push({
+                ...user,
+                activeBan: activeBan ? { reason: activeBan.reason } : null,
+            });
+        }
+
+        return res.status(200).json(usersWithDetails);
     } catch (err: any) {
-        res.status(500).json({ message: err.message || "Internal Server Error" });
+        return res.status(500).json({ message: err.message || "Internal Server Error" });
     }
 };
 
