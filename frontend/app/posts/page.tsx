@@ -4,11 +4,11 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPosts } from '@/app/store/postSlice';
 import { RootState } from '@/app/store/store';
-import { fetcher } from '@/app/utils/fetcher';
 import Link from 'next/link';
 import { Container, Typography, Button, Box } from '@mui/material';
 import FloatingSettings from '../components/FloatingSettings';
 import PostCard from '../components/PostCard';
+import { getPosts } from '../lib/postService';
 
 const PostListPage = () => {
   const dispatch = useDispatch();
@@ -17,7 +17,7 @@ const PostListPage = () => {
   useEffect(() => {
     const loadPosts = async () => {
       try {
-        const data = await fetcher('posts');
+        const data = await getPosts()
         dispatch(setPosts(data));
       } catch (error) {
         console.error(error);

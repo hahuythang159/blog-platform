@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { setUser } from '@/app/store/userSlice';
-import { fetcher } from '@/app/utils/fetcher';
+import { login } from '../lib/authService';
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -19,11 +19,7 @@ const LoginPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const data = await fetcher('auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
+      const data = await login(form);
       dispatch(setUser({ token: data.token }));
       
       router.push('/posts');

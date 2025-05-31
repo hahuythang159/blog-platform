@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store/store';
-import { fetcher } from '@/app/utils/fetcher';
 import RequireLoginDialog from '@/app/components/RequireLoginDialog';
+import { createPost } from '@/app/lib/postService';
 
 const CreatePostPage = () => {
   const [form, setForm] = useState({ title: '', content: '' });
@@ -24,11 +24,7 @@ const CreatePostPage = () => {
       return;
     }
     try {
-      await fetcher('posts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${user.token}` },
-        body: JSON.stringify(form),
-      });
+      await createPost(user.token, form)
       router.push('/posts');
     } catch (error) {
       console.error(error);

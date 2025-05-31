@@ -4,10 +4,11 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store/store';
-import { fetcher } from '@/app/utils/fetcher';
+import { getPostById, updatePostById } from '@/app/lib/postService';
 
 const EditPostPage = () => {
   const { id } = useParams();
+  const postId = id as string;
   const router = useRouter();
   const user = useSelector((state: RootState) => state.user.user);
   const [form, setForm] = useState({ title: '', content: '' });
@@ -15,14 +16,15 @@ const EditPostPage = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const data = await fetcher(`posts/${id}`);
+        if (!postId) return;
+        const data = await getPostById(postId);
         setForm({ title: data.title, content: data.content });
       } catch (error) {
         console.error(error);
       }
     };
     fetchPost();
-  }, [id]);
+  }, [postId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -30,14 +32,15 @@ const EditPostPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user?.token) return alert('You must log in to continue!');
+    if (!user?.token) {
+      alert('You must log in to continue!');
+      return;
+    }
+    if (!postId) return;
+
     try {
-      await fetcher(`posts/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${user.token}` },
-        body: JSON.stringify(form),
-      });
-      router.push(`/posts/${id}`);
+      await updatePostById(postId, user.token, form);
+      router.push(`/posts/${postId}`);
     } catch (error) {
       console.error(error);
     }

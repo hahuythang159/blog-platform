@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { fetcher } from '@/app/utils/fetcher';
+import { register } from '../lib/authService';
 
 const RegisterPage = () => {
   const [form, setForm] = useState({ username: '', email: '', password: '' });
@@ -16,11 +16,7 @@ const RegisterPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await fetcher('auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
+      await register(form);
       router.push('/login');
     } catch (err: any) {
       setError(err.message);

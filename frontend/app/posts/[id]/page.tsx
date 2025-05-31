@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { removePost, setPost } from '@/app/store/postSlice';
 import { RootState } from '@/app/store/store';
-import { fetcher } from '@/app/utils/fetcher';
 import { useParams, useRouter } from 'next/navigation';
 import PostCommentList from '@/app/components/PostCommentList';
 import { usePostStats } from '@/app/hooks/usePostStats';
 import { useViewTracker } from '@/app/hooks/useViewTracker';
 import LikeButton from '@/app/components/post/LikeButton';
 import { Comment } from '@/app/types';
+import { deletePostById, getPostById } from '@/app/lib/postService';
 
 const PostDetailPage = () => {
   const dispatch = useDispatch();
@@ -27,7 +27,7 @@ const PostDetailPage = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const data = await fetcher(`posts/${id}`);
+        const data = await getPostById(postId);
         dispatch(setPost(data));
         setComments(data.comments || []);
       } catch (error) {
@@ -43,14 +43,8 @@ const PostDetailPage = () => {
       return
     }
     try {
-      const res = await fetcher(`posts/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${user.token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
+      const res = await deletePostById(postId, user.token);
+      
       //Case status 204 No Content
       if (res === null) {
         dispatch(removePost(postId));

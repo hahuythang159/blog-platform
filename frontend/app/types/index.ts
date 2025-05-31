@@ -1,5 +1,5 @@
-export * from './profile.types';
-export * from './post.types';
+export * from './profile.types'
+export * from './post.types'
 export * from './commentPayload.types'
 export * from './comments.types'
 export * from './postState.types'
@@ -11,3 +11,8 @@ export * from './toggleBan.types'
 export * from './topPosts.types'
 export * from './user.types'
 export * from './userState.types'
+export * from './loginForm.type'
+export * from './loginResponse.type'
+export * from './registerForm.type'
+export * from './deletePostResponse.type'
+export * from './postPayload.type'
