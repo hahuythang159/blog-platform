@@ -4,21 +4,16 @@ import { useState } from 'react';
 import {
     IconButton,
     Typography,
-    Dialog,
-    DialogContent,
-    DialogActions,
-    Button,
 } from '@mui/material';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import { useToggleLike } from '@/app/hooks/useToggleLike';
 import { RootState } from '@/app/store/store';
-import { useRouter } from 'next/navigation';
 import { LikeButtonProps } from '@/app/interfaces/likeButtonProps';
+import RequireLoginDialog from '@/app/components/RequireLoginDialog';
 
 const LikeButton = ({ postId, likedBy, setStats }: LikeButtonProps) => {
     const user = useSelector((state: RootState) => state.user.user);
-    const router = useRouter();
     const { toggleLike, isLiking } = useToggleLike(postId, user?.token || '');
     const [showPrompt, setShowPrompt] = useState(false);
 
@@ -33,13 +28,6 @@ const LikeButton = ({ postId, likedBy, setStats }: LikeButtonProps) => {
         if (updated) setStats(updated);
     };
 
-    const handleLoginRedirect = () => {
-        setShowPrompt(false);
-        router.push('/login');
-    };
-
-    const handleClose = () => setShowPrompt(false);
-
     return (
         <>
             <IconButton onClick={handleClick} disabled={isLiking}>
@@ -49,21 +37,12 @@ const LikeButton = ({ postId, likedBy, setStats }: LikeButtonProps) => {
                 </Typography>
             </IconButton>
 
-            <Dialog open={showPrompt} onClose={handleClose}>
-                <DialogContent>
-                    <Typography variant="h6" gutterBottom>
-                        Like this content? You’ll love Soulink.
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        Log in to like, reply, and more.
-                    </Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleLoginRedirect} variant="contained" color="primary">
-                        Log in
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <RequireLoginDialog
+                open={showPrompt}
+                onClose={() => setShowPrompt(false)}
+                title='Please log in'
+                message='Log in to like and interact with posts.'
+            />
         </>
     );
 };

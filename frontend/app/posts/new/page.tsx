@@ -5,11 +5,13 @@ import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store/store';
 import { fetcher } from '@/app/utils/fetcher';
+import RequireLoginDialog from '@/app/components/RequireLoginDialog';
 
 const CreatePostPage = () => {
   const [form, setForm] = useState({ title: '', content: '' });
   const router = useRouter();
   const user = useSelector((state: RootState) => state.user.user);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -17,7 +19,10 @@ const CreatePostPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user?.token) return alert('You must log in to continue!');
+    if (!user?.token) {
+      setShowLoginModal(true);
+      return;
+    }
     try {
       await fetcher('posts', {
         method: 'POST',
@@ -38,6 +43,11 @@ const CreatePostPage = () => {
         <textarea name="content" placeholder="Content" onChange={handleChange} required />
         <button type="submit">Share</button>
       </form>
+      <RequireLoginDialog
+        open={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        title='Please log in'
+        message='Please log in to share your feelings' />
     </div>
   );
 };

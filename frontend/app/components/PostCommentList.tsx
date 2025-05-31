@@ -4,6 +4,7 @@ import { deleteComment, createComment } from '../lib/commentsService';
 import { RootState } from '../store/store';
 import { CommentListProps } from '../interfaces/commentListProps';
 import { getAvatarUrl } from '../lib/avatarService';
+import RequireLoginDialog from './RequireLoginDialog';
 
 const PostCommentList: React.FC<CommentListProps> = ({ comments, onDelete, onAdd, postId }) => {
   const user = useSelector((state: RootState) => state.user.user);
@@ -11,6 +12,7 @@ const PostCommentList: React.FC<CommentListProps> = ({ comments, onDelete, onAdd
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [avatarUrls, setAvatarUrls] = useState<{ [userId: string]: string }>({});
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     const loadAvatars = async () => {
@@ -35,7 +37,10 @@ const PostCommentList: React.FC<CommentListProps> = ({ comments, onDelete, onAdd
   }, [comments]);
 
   const handleDelete = async (commentId: string) => {
-    if (!user?.token) return alert('Please log in');
+    if (!user?.token) {
+      setShowLoginModal(true);
+      return;
+    }
 
     const confirmed = window.confirm('Are you sure you want to delete this comment?');
     if (!confirmed) return;
@@ -50,7 +55,12 @@ const PostCommentList: React.FC<CommentListProps> = ({ comments, onDelete, onAdd
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user?.token) return alert('Please log in');
+    if (!user?.token) {
+      setShowLoginModal(true);
+      return;
+    }
+
+
     if (!content.trim()) return alert('Comment cannot be empty');
     setLoading(true);
     try {
@@ -119,6 +129,12 @@ const PostCommentList: React.FC<CommentListProps> = ({ comments, onDelete, onAdd
           {loading ? 'Posting...' : 'Post Comment'}
         </button>
       </form>
+      <RequireLoginDialog
+        open={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        title="Please log in"
+        message="Please log in to comment and interact."
+      />
     </div>
   );
 };

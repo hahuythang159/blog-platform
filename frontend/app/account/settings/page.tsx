@@ -6,6 +6,9 @@ import { getProfile } from '@/app/lib/profileService';
 import ProfileForm from './ProfileForm';
 import DeleteAccountButton from './DeleteAccountButton';
 import { ProfileData } from '@/app/types';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/app/store/store';
+import RequireLoginDialog from '@/app/components/RequireLoginDialog';
 
 const AccountSettingsPage = () => {
   const [profile, setProfile] = useState<ProfileData>({
@@ -16,8 +19,15 @@ const AccountSettingsPage = () => {
   });
 
   const [loading, setLoading] = useState(true);
+  const user = useSelector((state: RootState) => state.user.user);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
+    if (!user?.token) {
+      setShowLoginModal(true);
+      setLoading(false);  // No need to fetch profile if not logged in
+      return;
+    }
     const fetch = async () => {
       const data = await getProfile();
       if (data) setProfile(data);
@@ -43,6 +53,12 @@ const AccountSettingsPage = () => {
       <Box sx={{ mt: 4 }}>
         <DeleteAccountButton />
       </Box>
+      <RequireLoginDialog
+        open={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        title='Please log in'
+        message='Please login to edit personal information!'
+      />
     </Box>
   );
 };
