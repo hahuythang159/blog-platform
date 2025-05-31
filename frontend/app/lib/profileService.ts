@@ -1,7 +1,7 @@
-import { ProfileData } from '@/app/interfaces/profileData';
 import { fetcher } from '@/app/utils/fetcher';
 import { getAvatarUrl } from './avatarService';
 import { getToken } from '../utils/token';
+import { ProfileData } from '../types';
 
 export const getProfile = async (): Promise<ProfileData | null> => {
     const token = getToken();

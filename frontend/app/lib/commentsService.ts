@@ -1,5 +1,4 @@
-import { CreateCommentPayload } from "../interfaces/commentPayload";
-import { Comment } from "../interfaces/comments";
+import { Comment, CreateCommentPayload } from "../types";
 import { fetcher, rawFetcher } from "../utils/fetcher";
 import { getToken } from "../utils/token";
 

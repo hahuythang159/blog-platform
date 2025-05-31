@@ -7,10 +7,10 @@ import { RootState } from '@/app/store/store';
 import { fetcher } from '@/app/utils/fetcher';
 import { useParams, useRouter } from 'next/navigation';
 import PostCommentList from '@/app/components/PostCommentList';
-import { Comment } from '@/app/interfaces/comments';
 import { usePostStats } from '@/app/hooks/usePostStats';
 import { useViewTracker } from '@/app/hooks/useViewTracker';
 import LikeButton from '@/app/components/post/LikeButton';
+import { Comment } from '@/app/types';
 
 const PostDetailPage = () => {
   const dispatch = useDispatch();

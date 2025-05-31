@@ -1,4 +1,4 @@
-import { Comment } from './comments';
+import { Comment } from '../types/comments.types';
 
 export interface CommentListProps {
   comments: Comment[];

@@ -11,6 +11,7 @@ export const useAdminAuth = () => {
   useEffect(() => {
     const token = getToken();
     const role = localStorage.getItem("role");
+    console.log(role)
 
     if (!token || role !== "admin") {
       alert("Access denied. Redirecting to login...");

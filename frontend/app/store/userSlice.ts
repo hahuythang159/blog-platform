@@ -1,19 +1,19 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { jwtDecode } from 'jwt-decode';
-import { UserState } from '../interfaces/userState';
 import { getToken } from '../utils/token';
+import { UserState } from '../types';
 
-const token = typeof window !== "undefined" ? getToken(): null;
+const token = typeof window !== "undefined" ? getToken() : null;
 const decodedToken: any = token ? jwtDecode(token) : null;
 
 const initialState: UserState = {
-  user: token 
-  ? {
-    _id: decodedToken?._id,
-    username: decodedToken?.username,
-    token,
-  }
-  : null,
+  user: token
+    ? {
+      _id: decodedToken?._id,
+      username: decodedToken?.username,
+      token,
+    }
+    : null,
 };
 
 const userSlice = createSlice({
@@ -23,7 +23,7 @@ const userSlice = createSlice({
     setUser: (state, action: PayloadAction<{ token: string }>) => {
       const { token } = action.payload;
 
-      try{
+      try {
         const decode: any = jwtDecode(token);
         state.user = {
           _id: decode._id,
@@ -37,9 +37,9 @@ const userSlice = createSlice({
         state.user = null;
       }
     },
-    logout: (state) =>{
-        state.user = null;
-        localStorage.removeItem('token');
+    logout: (state) => {
+      state.user = null;
+      localStorage.removeItem('token');
     }
   },
 });

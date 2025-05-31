@@ -1,4 +1,4 @@
-import { Post } from "@/app/interfaces/post";
+import { Post } from "@/app/types";
 import { fetcher } from "@/app/utils/fetcher";
 import { getToken } from "@/app/utils/token";
 

@@ -1,5 +1,5 @@
-import { User } from "@/app/interfaces/user";
-import { ToggleBanParams } from "@/app/interfaces/toggleBan";
+import { User } from "@/app/types/user.types";
+import { ToggleBanParams } from "@/app/types/toggleBan.types";
 
 export interface UserModalProps {
   open: boolean;

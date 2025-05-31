@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { getProfile } from '@/app/lib/profileService';
 import ProfileForm from './ProfileForm';
-import { ProfileData } from '@/app/interfaces/profileData';
 import DeleteAccountButton from './DeleteAccountButton';
+import { ProfileData } from '@/app/types';
 
 const AccountSettingsPage = () => {
   const [profile, setProfile] = useState<ProfileData>({

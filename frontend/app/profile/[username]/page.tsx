@@ -11,10 +11,10 @@ import Link from 'next/link';
 import { FavoriteBorder, ChatBubbleOutline } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store/store';
-import { Post, Profile } from '@/app/types';
 import { useMemo } from 'react';
 import { checkFollowingStatus, getFollowList, getProfilePublic, getUserPosts } from '@/app/api/profile';
 import { calculateTimeAgo } from '@/app/utils/timeUtils';
+import { Post, Profile } from '@/app/types';
 
 const UserProfilePage = () => {
 
@@ -50,7 +50,7 @@ const UserProfilePage = () => {
 
         // Check if logged-in user is following this profile
         if (loggedInUserId && loggedInUser.username !== profileData.username) {
-          const followRes = await await checkFollowingStatus(username, loggedInUserId);
+          const followRes = await checkFollowingStatus(username, loggedInUserId);
 
           if (!followRes) {
             throw new Error('No follow data returned');

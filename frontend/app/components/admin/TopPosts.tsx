@@ -1,4 +1,4 @@
-import { TopPostsProps } from "@/app/interfaces/topPosts";
+import { TopPostsProps } from "@/app/types";
 import { Box, Paper, Stack, Typography } from "@mui/material";
 
 const TopPosts = ({ posts }: TopPostsProps) => {

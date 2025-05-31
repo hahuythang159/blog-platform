@@ -1,6 +1,6 @@
+import { User } from "@/app/types";
 import { fetcher, rawFetcher } from "@/app/utils/fetcher";
 import { getToken } from "@/app/utils/token";
-import { User } from "@/app/interfaces/user";
 
 export const getUserList = async (): Promise<User[]> => {
   const token = getToken();

@@ -1,4 +1,4 @@
-import { ProfileData } from "./profileData";
+import { ProfileData } from "../types/profileData.types";
 
 export interface Props {
     profile: ProfileData;

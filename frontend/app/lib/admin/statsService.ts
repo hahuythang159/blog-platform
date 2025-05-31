@@ -1,4 +1,4 @@
-import { Stats } from "@/app/interfaces/stats";
+import { Stats } from "@/app/types";
 import { fetcher } from "@/app/utils/fetcher";
 import { getToken } from "@/app/utils/token";
 

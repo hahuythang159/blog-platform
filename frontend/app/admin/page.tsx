@@ -6,15 +6,13 @@ import {
   Typography,
   Stack,
 } from "@mui/material";
-import { Stats } from "../interfaces/stats";
-import { User } from "../interfaces/user";
 import { getSystemStats, getTopPosts } from "../lib/admin/statsService";
 import { getUserList, toggleBanStatus } from "../lib/admin/userService";
 import BentoCard from "../components/admin/BentoCard";
-import { ToggleBanParams } from "../interfaces/toggleBan";
 import TopPosts from "../components/admin/TopPosts";
 import UserModal from "../components/admin/UserModal";
 import { useAdminAuth } from "../hooks/useAdminAuth";
+import { Stats, ToggleBanParams, User } from "../types";
 
 export default function AdminDashboardPage() {
   const isAuthorized = useAdminAuth();

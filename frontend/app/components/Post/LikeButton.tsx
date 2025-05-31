@@ -14,7 +14,7 @@ import { useSelector } from 'react-redux';
 import { useToggleLike } from '@/app/hooks/useToggleLike';
 import { RootState } from '@/app/store/store';
 import { useRouter } from 'next/navigation';
-import { LikeButtonProps } from '@/app/types/likeButtonProps';
+import { LikeButtonProps } from '@/app/interfaces/likeButtonProps';
 
 const LikeButton = ({ postId, likedBy, setStats }: LikeButtonProps) => {
     const user = useSelector((state: RootState) => state.user.user);

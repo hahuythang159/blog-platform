@@ -1,4 +1,4 @@
-export interface ToggleBanParams {
+export type ToggleBanParams = {
   userId: string;
   isBanned: boolean | undefined;
   username: string;

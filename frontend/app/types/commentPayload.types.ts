@@ -1,4 +1,4 @@
-export interface CreateCommentPayload {
+export type CreateCommentPayload = {
     postId: string;
     content: string;
 }

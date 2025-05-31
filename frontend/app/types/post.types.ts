@@ -1,6 +1,6 @@
-import { Comment } from "./comments";
+import { Comment } from "./comments.types";
 
-export interface Post {
+export type Post = {
   _id: string;
   title: string;
   content: string;
@@ -14,4 +14,5 @@ export interface Post {
   comments?: Comment[];
   views: number;
   likes: string[];
+  createdAt: string;
 }

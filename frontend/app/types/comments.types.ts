@@ -1,4 +1,4 @@
-export interface Comment {
+export type Comment = {
     _id: string;
     content: string;
     post: string;
