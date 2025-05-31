@@ -76,6 +76,6 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
   }
 
   return res.status(200).json({
-    token: generateToken(user.id, user.username),
+    token: generateToken(user._id.toString(), user.username),
   });
 };
