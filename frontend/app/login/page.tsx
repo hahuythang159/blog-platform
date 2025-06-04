@@ -18,6 +18,7 @@ import AuthLayout from '../components/layout/AuthLayout';
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: '', password: '' });
+  const [stayLoggedIn, setStayLoggedIn] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
   const dispatch = useDispatch();
@@ -26,10 +27,22 @@ const LoginPage = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleCheckBoxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStayLoggedIn(e.target.checked);
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const data = await login(form);
+
+      // Handle token storage according to checkbox
+      if (stayLoggedIn) {
+        localStorage.setItem('token', data.token);
+      } else {
+        sessionStorage.setItem('token', data.token);
+      }
+
       dispatch(setUser({ token: data.token }));
       router.push('/posts');
     } catch (err: any) {
@@ -136,6 +149,8 @@ const LoginPage = () => {
         <FormControlLabel
           control={
             <Checkbox
+              checked={stayLoggedIn}
+              onChange={handleCheckBoxChange}
               sx={{
                 color: 'white',
                 mt: 2,

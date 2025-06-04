@@ -31,7 +31,6 @@ const userSlice = createSlice({
           token,
         };
 
-        localStorage.setItem('token', token);
       } catch (error) {
         console.error('Invalid token', error);
         state.user = null;
@@ -40,6 +39,7 @@ const userSlice = createSlice({
     logout: (state) => {
       state.user = null;
       localStorage.removeItem('token');
+      sessionStorage.removeItem('token');
     }
   },
 });
