@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 import { useToggleLike } from '@/app/hooks/useToggleLike';
 import { RootState } from '@/app/store/store';
 import { LikeButtonProps } from '@/app/interfaces/likeButtonProps';
-import RequireLoginDialog from '@/app/components/RequireLoginDialog';
+import RequireLoginDialog from '@/app/components/auth/RequireLoginDialog';
 
 const LikeButton = ({ postId, likedBy, setStats }: LikeButtonProps) => {
     const user = useSelector((state: RootState) => state.user.user);

@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { Box, Fab, Popover } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useDispatch } from 'react-redux';
-import { logout } from '../store/userSlice';
+import { logout } from '../../store/userSlice';
 import { useRouter } from 'next/navigation';
 import type { PopoverOrigin } from '@mui/material';
 import SettingsMenu from './SettingsMenu';
-import { toggleTheme } from '../store/themeSlice';
+import { toggleTheme } from '../../store/themeSlice';
 
 const popoverAnchorOrigin: PopoverOrigin = { vertical: 'top', horizontal: 'left' };
 const popoverTransformOrigin: PopoverOrigin = { vertical: 'bottom', horizontal: 'right' };

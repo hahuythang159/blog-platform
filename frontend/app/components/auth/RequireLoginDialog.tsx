@@ -9,7 +9,7 @@ import {
     Typography,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { RequireLoginDialogProps } from '../interfaces/requireLoginProps';
+import { RequireLoginDialogProps } from '../../interfaces/requireLoginProps';
 
 const RequireLoginDialog: React.FC<RequireLoginDialogProps> = ({
     open,

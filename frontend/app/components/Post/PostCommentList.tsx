@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { deleteComment, createComment } from '../lib/commentsService';
-import { RootState } from '../store/store';
-import { CommentListProps } from '../interfaces/commentListProps';
-import { getAvatarUrl } from '../lib/avatarService';
-import RequireLoginDialog from './RequireLoginDialog';
+import { deleteComment, createComment } from '../../lib/commentsService';
+import { RootState } from '../../store/store';
+import { CommentListProps } from '../../interfaces/commentListProps';
+import { getUserAvatarUrl } from '../../lib/avatarService';
+import RequireLoginDialog from '../auth/RequireLoginDialog';
 
 const PostCommentList: React.FC<CommentListProps> = ({ comments, onDelete, onAdd, postId }) => {
   const user = useSelector((state: RootState) => state.user.user);
@@ -22,7 +22,7 @@ const PostCommentList: React.FC<CommentListProps> = ({ comments, onDelete, onAdd
         comments.map(async (comment) => {
           const userId = comment.author._id;
           if (!avatarUrls[userId]) {
-            const url = await getAvatarUrl(userId);
+            const url = await getUserAvatarUrl(userId);
             if (url) newAvatars[userId] = url;
           }
         })

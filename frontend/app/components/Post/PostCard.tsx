@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Avatar, Card, CardContent, Divider, IconButton, Typography, Box } from '@mui/material';
 import { ChatBubbleOutline, MoreHoriz } from '@mui/icons-material';
-import { getAvatarUrl } from '../lib/avatarService';
-import { calculateTimeAgo } from '../utils/timeUtils';
+import { getUserAvatarUrl } from '../../lib/avatarService';
+import { calculateTimeAgo } from '../../utils/timeUtils';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { usePostStats } from '../hooks/usePostStats';
-import LikeButton from './post/LikeButton';
+import { usePostStats } from '../../hooks/usePostStats';
+import LikeButton from './LikeButton';
 
 const PostCard = ({ post }: { post: any }) => {
     const [avatarUrl, setAvatarUrl] = useState('');
@@ -16,7 +16,7 @@ const PostCard = ({ post }: { post: any }) => {
 
     useEffect(() => {
         const loadAvatar = async () => {
-            const url = await getAvatarUrl(post.author._id);
+            const url = await getUserAvatarUrl(post.author._id);
             setAvatarUrl(url);
         };
         loadAvatar();
