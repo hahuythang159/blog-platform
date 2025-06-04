@@ -3,14 +3,14 @@
 import { useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { deleteUserAccount } from '@/app/lib/accountService';
+import { deleteMyAccount } from '@/app/lib/myProfileService';
 
 const DeleteAccountButton = () => {
     const [open, setOpen] = useState(false);
     const router = useRouter();
 
     const handleDelete = async () => {
-        const success = await deleteUserAccount();
+        const success = await deleteMyAccount();
         if (success) {
             localStorage.removeItem('token');
             alert('Your account has been successfully deleted.');

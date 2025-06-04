@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store/store';
-import RequireLoginDialog from '@/app/components/RequireLoginDialog';
+import RequireLoginDialog from '@/app/components/auth/RequireLoginDialog';
 import { createPost } from '@/app/lib/postService';
 
 const CreatePostPage = () => {

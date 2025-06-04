@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { TextField, MenuItem, Button } from '@mui/material';
 import AvatarPreview from './AvatarPreview';
-import { updateProfile } from '@/app/lib/profileService';
+import { updateMyProfile } from '@/app/lib/myProfileService';
 import { Props } from '@/app/interfaces/props';
-import { uploadAvatar } from '@/app/lib/avatarService';
+import { uploadUserAvatar } from '@/app/lib/avatarService';
 
 const ProfileForm = ({ profile, setProfile }: Props) => {
   const [saving, setSaving] = useState(false);
@@ -31,7 +31,7 @@ const ProfileForm = ({ profile, setProfile }: Props) => {
   // Submit request to upload avatar and update information
   const handleUploadAvatar = async () => {
     if (file) {
-      const uploadedAvatarUrl = await uploadAvatar(file);
+      const uploadedAvatarUrl = await uploadUserAvatar(file);
       if (uploadedAvatarUrl) {
         setAvatarUrl(uploadedAvatarUrl);
       }
@@ -47,7 +47,7 @@ const ProfileForm = ({ profile, setProfile }: Props) => {
       await handleUploadAvatar();
     }
 
-    const success = await updateProfile({ ...profile, avatar: avatarUrl });
+    const success = await updateMyProfile({ ...profile, avatar: avatarUrl });
     alert(success ? 'Updated successfully!' : 'Update failed.');
     setSaving(false);
   };

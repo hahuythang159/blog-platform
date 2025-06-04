@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { removePost, setPost } from '@/app/store/postSlice';
 import { RootState } from '@/app/store/store';
 import { useParams, useRouter } from 'next/navigation';
-import PostCommentList from '@/app/components/PostCommentList';
+import PostCommentList from '@/app/components/post/PostCommentList';
 import { usePostStats } from '@/app/hooks/usePostStats';
 import { useViewTracker } from '@/app/hooks/useViewTracker';
 import LikeButton from '@/app/components/post/LikeButton';

@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
-import { getProfile } from '@/app/lib/profileService';
+import { getMyProfile } from '@/app/lib/myProfileService';
 import ProfileForm from './ProfileForm';
 import DeleteAccountButton from './DeleteAccountButton';
 import { ProfileData } from '@/app/types';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store/store';
-import RequireLoginDialog from '@/app/components/RequireLoginDialog';
+import RequireLoginDialog from '@/app/components/auth/RequireLoginDialog';
 
 const AccountSettingsPage = () => {
   const [profile, setProfile] = useState<ProfileData>({
@@ -29,7 +29,7 @@ const AccountSettingsPage = () => {
       return;
     }
     const fetch = async () => {
-      const data = await getProfile();
+      const data = await getMyProfile();
       if (data) setProfile(data);
       setLoading(false);
     };
