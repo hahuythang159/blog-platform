@@ -1,44 +1,58 @@
 import React from 'react';
 import { Box, Container, Paper, Typography } from '@mui/material';
-
-type AuthLayoutProps = {
-    title: string;
-    children: React.ReactNode;
-};
+import { AuthLayoutProps } from '@/app/types';
 
 const AuthLayout = ({ title, children }: AuthLayoutProps) => {
-    return (
-        <Box
-            sx={{
-                minHeight: '100vh',
-                backgroundImage: `url('/images/bg-login.jpg')`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                px: 10,
-            }}
+  return (
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundImage: `url('/images/background_authLayout.jpg')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        px: 2,
+      }}
+    >
+      <Container maxWidth="xs">
+        <Paper
+          elevation={6}
+          sx={{
+            backdropFilter: 'blur(10px)',
+            backgroundColor: '#000000',
+            padding: 4,
+            borderRadius: 6,
+            appearance: 'none',
+          }}
         >
-            <Container maxWidth="sm" >
-                <Paper
-                    elevation={6}
-                    sx={{
-                        backdropFilter: 'blur(10px)',
-                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                        padding: 4,
-                        borderRadius: 10,
-                    }}
-                >
-
-                    <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ color: '#ffffff', display: 'flex', justifyContent: 'center' }}>
-                        {title}
-                    </Typography>
-                    {children}
-                </Paper>
-            </Container>
-        </Box>
-    );
+          <Box sx={{ textAlign: 'center', mb: 2 }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontFamily: '"Inknut Antiqua", serif',
+                fontWeight: 'bold',
+                color: '#ffffff',
+              }}
+            >
+              {title}
+            </Typography>
+            <Box
+              sx={{
+                height: '3px',
+                width: '40%',
+                backgroundColor: '#ffffff',
+                margin: '10px auto 20px auto',
+                borderRadius: 1,
+              }} 
+            />
+          </Box>
+          {children}
+        </Paper>
+      </Container>
+    </Box>
+  );
 };
 
 export default AuthLayout;
