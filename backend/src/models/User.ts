@@ -7,7 +7,7 @@ export interface IUser extends Document {
     email: string;
     profile: mongoose.Types.ObjectId;
     password: string;
-    role?: "user" | "admin";
+    role: "user" | "admin";
 }
 
 const UserSchema: Schema = new Schema(
