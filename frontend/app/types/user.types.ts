@@ -3,6 +3,7 @@ export type User = {
     email?: string,
     username: string,
     token: string,
+    role: string,
     activeBan?: {
         reason: string;
     };

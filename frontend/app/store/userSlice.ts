@@ -11,6 +11,7 @@ const initialState: UserState = {
     ? {
       _id: decodedToken?._id,
       username: decodedToken?.username,
+      role: decodedToken.role,
       token,
     }
     : null,
@@ -28,6 +29,7 @@ const userSlice = createSlice({
         state.user = {
           _id: decode._id,
           username: decode.username,
+          role: decode.role,
           token,
         };
 
