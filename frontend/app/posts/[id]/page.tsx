@@ -5,12 +5,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { removePost, setPost } from '@/app/store/postSlice';
 import { RootState } from '@/app/store/store';
 import { useParams, useRouter } from 'next/navigation';
-import PostCommentList from '@/app/components/post/PostCommentList';
 import { usePostStats } from '@/app/hooks/usePostStats';
 import { useViewTracker } from '@/app/hooks/useViewTracker';
 import LikeButton from '@/app/components/post/LikeButton';
 import { Comment } from '@/app/types';
 import { deletePostById, getPostById } from '@/app/lib/postService';
+import CommentList from '@/app/components/comment/CommentList';
 
 const PostDetailPage = () => {
   const dispatch = useDispatch();
@@ -92,7 +92,7 @@ const PostDetailPage = () => {
           <LikeButton postId={postId} likedBy={stats.likes} setStats={setStats} />
         </div>
       )}
-      <PostCommentList
+      <CommentList
         comments={comments}
         postId={postId}
         onDelete={handleDeleteComment}
