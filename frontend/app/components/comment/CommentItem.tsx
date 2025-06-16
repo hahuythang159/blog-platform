@@ -2,13 +2,19 @@ import React from 'react';
 import { Box, Typography, Skeleton, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { CommentItemProps } from '../../interfaces/commentItemProps';
+import CommentItemSkeleton from '../skeletons/CommentItemSkeleton';
 
 const CommentItem: React.FC<CommentItemProps> = ({
     comment,
     avatarUrl,
+    isLoading,
     onDelete,
     currentUserId,
 }) => {
+    if (isLoading) {
+        return <CommentItemSkeleton />
+    }
+
     return (
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
             {avatarUrl ? (

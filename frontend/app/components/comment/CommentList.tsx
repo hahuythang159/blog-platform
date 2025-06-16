@@ -63,6 +63,7 @@ const CommentList: React.FC<CommentListProps> = ({ comments, postId, onAdd, onDe
             key={comment._id}
             comment={comment}
             avatarUrl={avatarUrls[comment.author._id] || ''}
+            isLoading={false}
             onDelete={handleDelete}
             currentUserId={currentUserId}
           />
