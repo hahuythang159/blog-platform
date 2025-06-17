@@ -7,14 +7,17 @@ import PostStats from "../models/PostStats";
  */
 const applyPostCascadeDelete = (PostSchema: Schema) => {
     PostSchema.pre("deleteOne", { document: true, query: false }, async function (next) {
-        const postId = this._id;
         try {
-            // Delete related comments
-            await Comment.deleteMany({ post: postId });
-            // Delete related post stats
-            await PostStats.deleteOne({ post: postId });
+            const postId = this._id;
+            await Promise.all([
+                // Delete related comments
+                Comment.deleteMany({ post: postId }),
+                // Delete related post stats
+                PostStats.deleteOne({ post: postId })
+            ]);
+
+            next();
         } catch (error: any) {
-            console.error("Failed to delete comments when deleting post:", error);
             return next(error);
         }
         next();

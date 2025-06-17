@@ -10,22 +10,25 @@ import PostStats from "../models/PostStats";
  */
 const applyUserCascadeDelete = (UserSchema: Schema) => {
     UserSchema.pre("deleteOne", { document: true, query: false }, async function (next) {
-        const userId = this._id;
+
         try {
+            const userId = this._id;
             const userPosts = await Post.find({ author: userId }).select("_id");
             const postIds = userPosts.map(post => post._id);
-            await Post.deleteMany({ author: userId });
-            await PostStats.deleteMany({ post: { $in: postIds } });
-            await Comment.deleteMany({ author: userId });
-            await Profile.deleteOne({ user: userId });
 
-            await Profile.updateMany({ followers: userId }, { $pull: { followers: userId } });
-            await Profile.updateMany({ following: userId }, { $pull: { following: userId } });
+            await Promise.all([
+                Post.deleteMany({ author: userId }),
+                PostStats.deleteMany({ post: { $in: postIds } }),
+                Comment.deleteMany({ author: userId }),
+                Profile.deleteOne({ user: userId }),
+                Profile.updateMany({ followers: userId }, { $pull: { followers: userId } }),
+                Profile.updateMany({ following: userId }, { $pull: { following: userId } })
+            ]);
+
+            next();
         } catch (error: any) {
-            console.error("Failed to cascade delete for user:", error);
             return next(error);
         }
-        next();
     });
 };
 
