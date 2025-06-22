@@ -1,54 +1,65 @@
 import { Response } from "express";
 import { AuthRequest } from "../types/customRequest";
 import Post from "../models/Post";
+import Tag from "../models/Tag";
+import slugify from "slugify";
+import mongoose from "mongoose";
 
-// Get list of Posts
-export const getPost = async (req: AuthRequest, res: Response): Promise<any> => {
+/**
+ * GET /api/posts
+ * Get a list of posts, optionally filtered by tag.
+ * Useful for displaying the main blog feed or tag-specific results.
+ */
+export const getPosts = async (req: AuthRequest, res: Response): Promise<any> => {
     try {
-        const posts = await Post.find()
-            .populate({
-                path: 'author',
-                select: 'username',
-            })
+        const tagSlug = (req.query.tag as string) || null;
+        let filter: any = {};
+
+        if (tagSlug) {
+            const tag = await Tag.findOne({ slug: tagSlug }).lean();
+            if (!tag) return res.status(404).json({ message: 'Tag not found' });
+            filter.tags = tag._id;
+        }
+
+        const posts = await Post.find(filter)
+            .sort({ createdAt: -1 })
+            .select('title content author tags createdAt updatedAt')
+            .populate('author', 'username')
+            .populate('tags', 'name slug')
             .lean();
 
-        posts.map((post: any) => {
-            const authorId = post.author?._id;
-            post.author.avatarUrl = `/api/user/avatar/${authorId}`;
+        const result = posts.map(post => {
+            if (post.author?._id) {
+                (post.author as any).avatarUrl = `/api/users/${post.author._id}/avatar`;
+            }
             return post;
         });
 
-        res.json(posts);
+        res.json(result);
     } catch (error: any) {
         return res.status(500).json({ message: error.message || 'Internal server error' });
     }
 };
 
-// Get Post Details with Comments
+/**
+ * GET /api/posts/:id
+ * Get detailed information about a specific post, including author and tags.
+ * Useful for rendering the full post view on the frontend.
+ */
 export const getPostById = async (req: AuthRequest, res: Response): Promise<any> => {
     try {
         const post = await Post.findById(req.params.id)
-            .populate({
-                path: "author",
-                select: "username profile",
-                populate: {
-                    path: "profile",
-                    select: "_id"
-                }
-            })
-            .populate({
-                path: "comments",
-                populate: {
-                    path: "author",
-                    select: "username profile",
-                    populate: {
-                        path: "profile",
-                        select: "_id"
-                    }
-                }
-            });
-
+            .sort({ createdAt: -1 })
+            .select('title content author tags createdAt updatedAt')
+            .populate('author', 'username')
+            .populate('tags', 'name slug')
+            .lean();
         if (!post) return res.status(404).json({ message: "Post does not exist" });
+
+        // Add avatar URL
+        if (post.author?._id) {
+            (post.author as any).avatarUrl = `/api/users/${post.author._id}/avatar`;
+        }
 
         res.json(post);
     } catch (error: any) {
@@ -56,23 +67,40 @@ export const getPostById = async (req: AuthRequest, res: Response): Promise<any>
     }
 };
 
-// Create a new Post
+/**
+ * POST /api/posts
+ * Create a new post with title, content, and optional tags.
+ * Only authenticated users can create posts.
+ */
 export const createPost = async (req: AuthRequest, res: Response): Promise<any> => {
     try {
         if (!req.user) return res.status(401).json({ message: "The user is not logged in" });
 
-        const { title, content } = req.body;
+        const { title, content, tags = [] } = req.body;
         if (!title || !content) return res.status(400).json({ message: "Title and content are required" });
 
-        const newPost = new Post({ title, content, author: req.user.id });
+        const tagIds: mongoose.Types.ObjectId[] = [];
+        for (let raw of tags) {
+            const name = String(raw).trim().toLowerCase();
+            const slug = slugify(name, { lower: true });
+            let tag = await Tag.findOne({ slug });
+            if (!tag) tag = await Tag.create({ name, slug });
+            tagIds.push(tag._id as mongoose.Types.ObjectId);
+        }
+
+        const newPost = new Post({ title, content, tags: tagIds, author: req.user.id });
         await newPost.save();
-        res.status(201).json(newPost);
+        res.status(201).json({ message: "Posted successfully" });
     } catch (error: any) {
         return res.status(500).json({ message: error.message || 'Internal server error' });
     }
 };
 
-// Update Post
+/**
+ * PUT /api/posts/:id
+ * Update an existing post (title and content).
+ * Only the author of the post can update it.
+ */
 export const updatePost = async (req: AuthRequest, res: Response): Promise<any> => {
     try {
         if (!req.user) return res.status(401).json({ message: "The user is not logged in" });
@@ -95,7 +123,11 @@ export const updatePost = async (req: AuthRequest, res: Response): Promise<any> 
     }
 };
 
-// Delete Post
+/**
+ * DELETE /api/posts/:id
+ * Delete a specific post.
+ * Only the author of the post can delete it.
+ */
 export const deletePost = async (req: AuthRequest, res: Response): Promise<any> => {
     try {
         if (!req.user) return res.status(401).json({ message: "The user is not logged in" });
