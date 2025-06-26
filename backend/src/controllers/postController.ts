@@ -30,7 +30,7 @@ export const getPosts = async (req: AuthRequest, res: Response): Promise<any> =>
 
         const result = posts.map(post => {
             if (post.author?._id) {
-                (post.author as any).avatarUrl = `/api/users/${post.author._id}/avatar`;
+                (post.author as any).avatarUrl = `/api/user/avatar/${post.author._id}`;
             }
             return post;
         });

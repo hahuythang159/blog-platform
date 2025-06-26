@@ -73,10 +73,10 @@ export const getCommentsByPost = async (req: AuthRequest, res: Response): Promis
             .sort({ createdAt: -1 })
             .lean();
 
-        comments.map((comment: any) => {
-            const authorId = comment.author?._id;
-            comment.author.avatarUrl = `/api/users/${authorId}/avatar`;
-            return comment;
+        comments.forEach((comment: any) => {
+            if (comment.author && comment.author._id) {
+                comment.author.avatarUrl = `/api/user/avatar/${comment.author._id}`;
+            }
         });
 
         res.json(comments);
