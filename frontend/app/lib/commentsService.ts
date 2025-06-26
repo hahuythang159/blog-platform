@@ -30,7 +30,7 @@ export async function createComment(payload: CreateCommentPayload): Promise<Comm
  * @returns Promise resolving to an array of Comment objects
  */
 export async function getCommentsByPost(postId: string): Promise<Comment[]> {
-    const res = await fetcher(`comments/${postId}`);
+    const res = await rawFetcher(`comments/post/${postId}`);
 
     if (!res.ok) {
         const error = await res.json();

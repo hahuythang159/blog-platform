@@ -6,10 +6,7 @@ export type Post = {
   content: string;
   author: {
     username: string;
-    profile: {
-      avatarData?: string;
-      avatarType?: string;
-    };
+    avatarUrl: string;
   };
   comments?: Comment[];
   views: number;

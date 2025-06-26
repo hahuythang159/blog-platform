@@ -11,6 +11,7 @@ import LikeButton from '@/app/components/post/LikeButton';
 import { Comment } from '@/app/types';
 import { deletePostById, getPostById } from '@/app/lib/postService';
 import CommentList from '@/app/components/comment/CommentList';
+import { getCommentsByPost } from '@/app/lib/commentsService';
 
 const PostDetailPage = () => {
   const dispatch = useDispatch();
@@ -25,17 +26,31 @@ const PostDetailPage = () => {
   useViewTracker(postId);
 
   useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const data = await getPostById(postId);
-        dispatch(setPost(data));
-        setComments(data.comments || []);
-      } catch (error) {
-        console.error(error);
-      }
-    };
     fetchPost();
-  }, [dispatch, id]);
+    fetchComments();
+  }, [postId]);
+
+  const fetchPost = async () => {
+    try {
+      const data = await getPostById(postId);
+      dispatch(setPost(data));
+    } catch (error) {
+      // TODO: Currently logging errors to the console for development/debugging purposes.
+      // This should be replaced with proper user-facing error handling (e.g., UI notification, toast) later.
+      console.error(error);
+    }
+  };
+
+  const fetchComments = async () => {
+    try {
+      const data = await getCommentsByPost(postId);
+      setComments(data);
+    } catch (error) {
+      // TODO: Currently logging errors to the console for development/debugging purposes.
+      // This should be replaced with proper user-facing error handling (e.g., UI notification, toast) later.
+      console.error(error);
+    }
+  };
 
   const handleDelete = async () => {
     if (!user?.token) {
@@ -44,7 +59,7 @@ const PostDetailPage = () => {
     }
     try {
       const res = await deletePostById(postId, user.token);
-      
+
       //Case status 204 No Content
       if (res === null) {
         dispatch(removePost(postId));
