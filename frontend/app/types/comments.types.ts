@@ -5,10 +5,8 @@ export type Comment = {
     author: {
         _id: string;
         username: string;
-        profile?: {
-            avatarData?: string;
-            avatarType?: string;
-        };
+        avatarUrl?: string;
+
     };
     createdAt: string;
     updatedAt: string;

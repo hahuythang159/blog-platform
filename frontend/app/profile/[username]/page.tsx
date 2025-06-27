@@ -1,20 +1,22 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
-import {
-  Container, Typography, Avatar, Box, CircularProgress, Card, CardContent, Divider, IconButton, Button,
-  Tabs, Tab, List, ListItem, ListItemAvatar, ListItemText
-} from '@mui/material';
-import { fetcher } from '@/app/utils/fetcher';
-import Link from 'next/link';
-import { FavoriteBorder, ChatBubbleOutline } from '@mui/icons-material';
+import { Container, Box, CircularProgress, Typography, Tabs, Tab } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store/store';
-import { useMemo } from 'react';
-import { checkUserFollowing, getFollowList, getUserProfile, getUserPosts } from '@/app/lib/profileService';
-import { calculateTimeAgo } from '@/app/utils/timeUtils';
-import { Post, Profile } from '@/app/types';
+import {
+  checkUserFollowing,
+  getFollowList,
+  getUserProfile,
+  getUserPosts,
+  toggleFollowUser,
+} from '@/app/lib/profileService';
+import { Profile, Post } from '@/app/types';
+import ProfileInfo from '@/app/components/userProfile/ProfileInfo';
+import FollowStats from '@/app/components/userProfile/FollowStats';
+import FollowList from '@/app/components/userProfile/FollowList';
+import UserPosts from '@/app/components/userProfile/UserPosts';
 
 const UserProfilePage = () => {
 
@@ -76,14 +78,7 @@ const UserProfilePage = () => {
     setIsProcessing(true);
 
     try {
-      const data = await fetcher(`follow/${username}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ followerId: loggedInUserId }),
-      });
-
+      const data = await toggleFollowUser(username, loggedInUserId);
       // Update tracking status
       setIsFollowing(data.following);
 
@@ -128,74 +123,23 @@ const UserProfilePage = () => {
     if (username) fetchFollowList(tab);
   }, [tab, username]);
 
-  const renderFollowList = useMemo(() => {
-    const data = tab === 'followers' ? followers : following;
-
-    if (loadingList) return <Typography>Loading...</Typography>;
-    if (data.length === 0) return <Typography> No data available</Typography>;
-
-    return (
-      <List>
-        {data.map((user) => (
-          <Link key={user.userId} href={`/profile/${user.username}`} passHref legacyBehavior>
-            <ListItem sx={{ cursor: 'pointer' }}>
-              <ListItemAvatar>
-                <Avatar src={user.avatar} />
-              </ListItemAvatar>
-              <ListItemText
-                primary={user.username}
-              />
-            </ListItem>
-          </Link>
-        ))}
-      </List>
-    );
-  }, [tab, followers, following, loadingList]);
-
-
   if (loading) return <Box textAlign="center"><CircularProgress /></Box>;
   if (!profile) return <Typography>User not found</Typography>;
 
   return (
     <Container maxWidth="sm" sx={{ paddingY: 4 }}>
-      {/* Profile Info Section */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Avatar src={avatarUrl} sx={{ width: 80, height: 80 }} />
-        <Box>
-          <Typography variant="h5">{profile.username}</Typography>
-          <Typography variant="body2" color="text.secondary">{profile.bio || 'No bio yet'}</Typography>
-        </Box>
-      </Box>
+      <ProfileInfo
+        profile={profile}
+        isFollowing={isFollowing}
+        isProcessing={isProcessing}
+        onToggleFollow={handleToggleFollow}
+        loggedInUser={loggedInUser}
+      />
 
-      {/* Profile Stats */}
-      <Box sx={{ marginTop: 3 }}>
-        <Typography>👥 Followers: {profile.followersCount}</Typography>
-        <Typography>➡️ Following: {profile.followingCount}</Typography>
-        <Typography>📝 Posts: {profile.postCount}</Typography>
-        {profile.gender && <Typography>🚻 Gender: {profile.gender}</Typography>}
+      <FollowStats profile={profile} />
 
-        {loggedInUser && loggedInUser.username !== profile.username && (
-          <Box sx={{ marginTop: 2 }}>
-            <Button
-              variant={isFollowing ? 'outlined' : 'contained'}
-              color="primary"
-              onClick={handleToggleFollow}
-              disabled={isProcessing}
-            >
-              {isProcessing
-                ? 'Processing...'
-                : isFollowing
-                  ? 'Unfollow'
-                  : 'Follow'}
-            </Button>
-          </Box>
-        )}
-      </Box>
       <Box sx={{ marginTop: 5 }}>
-        <Typography variant="h6" gutterBottom>
-          📋 List Follow
-        </Typography>
-
+        <Typography variant="h6" gutterBottom>📋 List Follow</Typography>
         <Tabs
           value={tab}
           onChange={(e, newValue) => setTab(newValue)}
@@ -206,64 +150,16 @@ const UserProfilePage = () => {
           <Tab value="following" label={`Following (${following.length})`} />
         </Tabs>
 
-        <Box sx={{ marginTop: 2 }}>
-          {renderFollowList}
-        </Box>
+        <FollowList
+          tab={tab}
+          followers={followers}
+          following={following}
+          loadingList={loadingList}
+        />
       </Box>
 
-      {/* User Posts */}
-      <Box sx={{ marginTop: 5 }}>
-        <Typography variant="h6" gutterBottom>
-          📝 Posts by {profile.username}
-        </Typography>
-
-        {/* Show message if user has no posts */}
-        {posts.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
-            This user has not posted anything yet.
-          </Typography>
-        ) : (
-          // Loop through and render user's posts
-          posts.map((post) => (
-            <Card key={post._id} sx={{ borderRadius: 2, marginBottom: 2 }}>
-              <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'left' }}>
-                  {calculateTimeAgo(post.createdAt)}
-                </Typography>
-
-                {/* Post title with link to full post */}
-                <Typography
-                  variant="h6"
-                  component={Link}
-                  href={`/posts/${post._id}`}
-                  sx={{
-                    fontWeight: 600,
-                    textDecoration: 'none',
-                    color: 'inherit',
-                    marginBottom: 1,
-                  }}
-                >
-                  {post.title}
-                </Typography>
-
-                {/* Post content preview (limited to 100 chars) */}
-                <Typography variant="body2" color="text.secondary">
-                  {post.content.length > 100 ? post.content.slice(0, 100) + '...' : post.content}
-                </Typography>
-              </CardContent>
-              <Divider />
-              <CardContent sx={{ display: 'flex', justifyContent: 'space-between', paddingTop: 1 }}>
-                <IconButton><FavoriteBorder /></IconButton>
-                <IconButton component={Link} href={`/posts/${post._id}`}>
-                  <ChatBubbleOutline />
-                </IconButton>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </Box>
+      <UserPosts posts={posts} username={profile.username} />
     </Container>
   );
 };
-
 export default UserProfilePage;
