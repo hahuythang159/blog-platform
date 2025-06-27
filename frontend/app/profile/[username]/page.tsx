@@ -60,6 +60,14 @@ const UserProfilePage = () => {
 
           setIsFollowing(followRes.isFollowing);
         }
+        // 👇 Preload both followers and following lists
+        const [followersRes, followingRes] = await Promise.all([
+          getFollowList(username, 'followers'),
+          getFollowList(username, 'following'),
+        ]);
+
+        setFollowers(followersRes.followers || []);
+        setFollowing(followingRes.following || []);
 
       } catch (err) {
         console.error(err);
@@ -120,7 +128,15 @@ const UserProfilePage = () => {
   };
 
   useEffect(() => {
-    if (username) fetchFollowList(tab);
+    if (!username) return;
+
+    if (tab === 'followers' && followers.length === 0) {
+      fetchFollowList('followers');
+    }
+
+    if (tab === 'following' && following.length === 0) {
+      fetchFollowList('following');
+    }
   }, [tab, username]);
 
   if (loading) return <Box textAlign="center"><CircularProgress /></Box>;
