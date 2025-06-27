@@ -4,6 +4,7 @@ import Comment from "../models/Comment";
 import Post from "../models/Post";
 import mongoose from "mongoose";
 import { getAuthUserId } from "../utils/getAuthUserId";
+import { PopulatedComment } from "../types/comment,types";
 
 /**
  * POST /api/comments
@@ -35,13 +36,19 @@ export const createComment = async (req: AuthRequest, res: Response): Promise<an
         const post = await Post.findById(postId);
         if (!post) return res.status(404).json({ message: "Post does not exist" });
 
-        const comment = await Comment.create({
-            content,
-            post: postId,
-            author: userId,
-        });
+        const newComment = await Comment.create({ content: content, post: postId, author: userId });
 
-        res.status(201).json(comment);
+        const populatedComment = await Comment.findById(newComment._id)
+            .populate({ path: "author", select: "username" })
+            .lean<PopulatedComment>();
+
+        if (!populatedComment) {
+            return res.status(404).json({ message: "Comment not found after creation" });
+        }
+
+        populatedComment.author.avatarUrl = `/api/user/avatar/${populatedComment.author._id}`;
+
+        res.status(201).json(populatedComment);
     } catch (err: any) {
         res.status(500).json({ message: err.message || "Server error" });
     }
