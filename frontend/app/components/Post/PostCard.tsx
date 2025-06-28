@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { usePostStats } from '../../hooks/usePostStats';
 import LikeButton from './LikeButton';
+import Chip from '@mui/material/Chip'
 
 const PostCard = ({ post }: { post: any }) => {
     const [avatarUrl, setAvatarUrl] = useState('');
@@ -65,6 +66,26 @@ const PostCard = ({ post }: { post: any }) => {
                 <Typography variant="body2" color="text.secondary">
                     {post.content.length > 100 ? post.content.slice(0, 100) + '...' : post.content}
                 </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2, maxWidth: '100%' }}>
+                    {post.tags?.map((tag: any) => (
+                        <Chip
+                            key={tag._id}
+                            label={`#${tag.name}`}
+                            variant="outlined"
+                            size="small"
+                            sx={{
+                                fontSize: '0.75rem',
+                                color: 'primary.main',
+                                borderColor: 'primary.light',
+                                cursor: 'pointer',
+                                '&:hover': {
+                                    backgroundColor: 'primary.light',
+                                    color: 'white',
+                                },
+                            }}
+                        />
+                    ))}
+                </Box>
             </CardContent>
 
             <Divider />
