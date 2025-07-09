@@ -103,3 +103,14 @@ export const createPost = async (token: string, payload: PostPayload): Promise<v
 export const getPosts = async (): Promise<Post[]> => {
     return await fetcher('posts');
 };
+
+/**
+ * Fetch posts filtered by a specific tag slug.
+ * 
+ * @param tagSlug - The slug of the tag to filter posts by (e.g. "javascript")
+ * @returns Promise resolving to an array of posts associated with the tag
+ */
+export const getPostsByTagSlug = async (tagSlug: string): Promise<Post[]> => {
+    const query = new URLSearchParams({ tag: tagSlug });
+    return await fetcher(`posts?${query.toString()}`);
+}

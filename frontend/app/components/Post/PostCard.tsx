@@ -83,6 +83,10 @@ const PostCard = ({ post }: { post: any }) => {
                                     color: 'white',
                                 },
                             }}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/posts/tags/${tag.slug}`)
+                            }}
                         />
                     ))}
                 </Box>
