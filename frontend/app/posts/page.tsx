@@ -4,32 +4,35 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPosts } from '@/app/store/postSlice';
 import { RootState } from '@/app/store/store';
-import Link from 'next/link';
-import { Container, Typography, Button, Box, Alert } from '@mui/material';
+import { Container, Typography, Button, Box, Alert, Modal, Fade, Backdrop, Snackbar } from '@mui/material';
 import FloatingSettings from '../components/user/FloatingSettings';
 import PostCard from '../components/post/PostCard';
 import { getPosts } from '../lib/postService';
 import PostCardSkeleton from '../components/skeletons/PostCardSkeleton';
+import CreatePostForm from '../components/post/CreatePostForm';
 
 const PostListPage = () => {
   const dispatch = useDispatch();
   const posts = useSelector((state: RootState) => state.post.posts);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [openForm, setOpenForm] = useState<boolean>(false);
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false)
+
+  const loadPosts = async () => {
+    try {
+      const data = await getPosts();
+      dispatch(setPosts(data));
+      setError(null);
+    } catch (err: any) {
+      setError(err?.message || 'Could not load posts. Please try again later.');
+      setOpenSnackbar(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadPosts = async () => {
-      try {
-        const data = await getPosts()
-        dispatch(setPosts(data));
-        setError(null); // Clear error if refetch is successful
-      } catch (err: any) {
-        console.error('Failed to fetch posts:', err);
-        setError('Could not load posts. Please try again later.');
-      } finally {
-        setIsLoading(false)
-      }
-    };
     loadPosts();
   }, [dispatch]);
 
@@ -40,22 +43,50 @@ const PostListPage = () => {
         Community Posts
       </Typography>
 
-      {/* Button to navigate to the post creation page */}
       <Button
         variant="contained"
         color="primary"
-        component={Link}
-        href="/posts/new"
+        onClick={() => setOpenForm(true)}
         sx={{ marginBottom: 3, borderRadius: '20px' }}
       >
         Create Your Post
       </Button>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+      <Modal open={openForm} onClose={() => setOpenForm(false)} closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{ backdrop: { timeout: 300 } }}
+      >
+        <Fade in={openForm}>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '100%',
+              maxWidth: 600,
+              bgcolor: 'background.paper',
+              borderRadius: 2,
+              boxShadow: 24,
+              p: 4,
+              outline: 'none',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+            }}
+          >
+            <CreatePostForm onPostCreated={() => {
+              loadPosts(), setOpenForm(false);
+            }}
+            />
+          </Box>
+        </Fade>
+      </Modal>
+
+      <Snackbar open={openSnackbar} onClose={() => setOpenSnackbar(false)} autoHideDuration={6000} anchorOrigin={{ vertical: 'top', horizontal: 'right' }} >
+        <Alert severity="error" sx={{ width: '100%' }}>
           {error}
         </Alert>
-      )}
+      </Snackbar>
 
       {/* Post list */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
