@@ -10,6 +10,7 @@ import userRoutes from "./src/routes/userRoutes";
 import commentRoutes from "./src/routes/commentRoutes";
 import postStatsRoutes from "./src/routes/postStatsRoutes";
 import adminRoutes from "./src/routes/adminRoutes";
+import userInteraction from "./src/routes/userInteractionRoutes";
 
 import { createDefaultAdmin } from "./src/seeds/initAdmin";
 
@@ -42,6 +43,8 @@ app.use("/api/comments", commentRoutes);
 app.use("/api/post-stats", postStatsRoutes)
 
 app.use("/api/admin", adminRoutes);
+
+app.use("/api/user-interactions", userInteraction)
 
 const PORT = process.env.PORT || 5000;
 connectDB().then(async () => {
