@@ -12,6 +12,7 @@ import { Comment } from '@/app/types';
 import { deletePostById, getPostById } from '@/app/lib/postService';
 import CommentList from '@/app/components/comment/CommentList';
 import { getCommentsByPost } from '@/app/lib/commentsService';
+import { useRecordInteraction } from '@/app/hooks/useRecordInteraction';
 
 const PostDetailPage = () => {
   const dispatch = useDispatch();
@@ -22,19 +23,21 @@ const PostDetailPage = () => {
   const user = useSelector((state: RootState) => state.user.user);
   const [comments, setComments] = useState<Comment[]>([]);
   const { stats, setStats } = usePostStats(postId);
+  const { triggerInteraction } = useRecordInteraction();
 
   useViewTracker(postId);
 
   useEffect(() => {
     fetchPost();
     fetchComments();
-  }, [postId]);
+    triggerInteraction(postId, 'view')
+  }, [postId, triggerInteraction]);
 
   const fetchPost = async () => {
     try {
       const data = await getPostById(postId);
       dispatch(setPost(data));
-    } catch (error) {
+    } catch (error: any) {
       // TODO: Currently logging errors to the console for development/debugging purposes.
       // This should be replaced with proper user-facing error handling (e.g., UI notification, toast) later.
       console.error(error);

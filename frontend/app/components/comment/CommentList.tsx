@@ -70,7 +70,7 @@ const CommentList: React.FC<CommentListProps> = ({ comments, postId, onAdd, onDe
         ))
       )}
 
-      <CommentForm onSubmit={handleAdd} isLoading={loading} />
+      <CommentForm onSubmit={handleAdd} isLoading={loading} postId={postId} />
     </Box>
   );
 };

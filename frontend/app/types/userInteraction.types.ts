@@ -1,0 +1,1 @@
+export type InteractionType = "view" | "like" | "comment"

@@ -1,21 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import {
-    IconButton,
-    Typography,
-} from '@mui/material';
+import { IconButton, Typography } from '@mui/material';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import { useToggleLike } from '@/app/hooks/useToggleLike';
 import { RootState } from '@/app/store/store';
 import { LikeButtonProps } from '@/app/interfaces/likeButtonProps';
 import RequireLoginDialog from '@/app/components/auth/RequireLoginDialog';
+import { useRecordInteraction } from '@/app/hooks/useRecordInteraction';
 
 const LikeButton = ({ postId, likedBy, setStats }: LikeButtonProps) => {
     const user = useSelector((state: RootState) => state.user.user);
     const { toggleLike, isLiking } = useToggleLike(postId, user?.token || '');
     const [showPrompt, setShowPrompt] = useState(false);
+    const { triggerInteraction } = useRecordInteraction();
 
     const isLiked = likedBy?.some(u => u._id === user?._id);
 
@@ -25,7 +24,10 @@ const LikeButton = ({ postId, likedBy, setStats }: LikeButtonProps) => {
             return;
         }
         const updated = await toggleLike();
-        if (updated) setStats(updated);
+        if (updated) {
+            setStats(updated)
+            await triggerInteraction(postId, 'like')
+        }
     };
 
     return (

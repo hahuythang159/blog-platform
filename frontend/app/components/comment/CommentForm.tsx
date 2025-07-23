@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Box, TextField, Button } from '@mui/material';
 import { CommentFormProps } from '../../interfaces/commentFormProps';
+import { useRecordInteraction } from '@/app/hooks/useRecordInteraction';
 
-const CommentForm: React.FC<CommentFormProps> = ({ onSubmit, isLoading }) => {
+const CommentForm: React.FC<CommentFormProps> = ({ onSubmit, isLoading, postId }) => {
     const [content, setContent] = useState('');
+    const { triggerInteraction } = useRecordInteraction()
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -13,6 +15,9 @@ const CommentForm: React.FC<CommentFormProps> = ({ onSubmit, isLoading }) => {
         }
         onSubmit(content);
         setContent('');
+        if (postId) {
+            triggerInteraction(postId, 'comment')
+        }
     };
 
     return (
