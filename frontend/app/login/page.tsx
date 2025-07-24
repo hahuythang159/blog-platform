@@ -175,13 +175,6 @@ const LoginPage = () => {
           }
         />
 
-        {/* Error */}
-        {error && (
-          <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-            {error}
-          </Typography>
-        )}
-
         {/* Submit Button */}
         <Button
           type="submit"
@@ -205,11 +198,18 @@ const LoginPage = () => {
           Sign In
         </Button>
 
+        {/* Error */}
+        {error && (
+          <Typography color="error" variant="body2" sx={{ mt: 2, textAlign: "center" }}>
+            {error}
+          </Typography>
+        )}
+
         <Typography
           variant="body2"
           align="center"
           sx={{
-            mt: 4,
+            mt: 3,
             color: '#E9E9E9',
             fontFamily: '"Inknut Antiqua", serif',
             fontWeight: 'bold',

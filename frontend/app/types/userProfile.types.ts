@@ -5,7 +5,7 @@ import { Profile } from "./profile.types";
  * Props for the FollowStats component.
  * Displays basic user statistics such as number of followers, followings, posts, and optionally gender.
  */
-export interface FollowStatsProps {
+export type FollowStatsProps = {
     profile: Profile;
 }
 
