@@ -55,7 +55,7 @@ const ProfileForm = ({ profile, setProfile }: Props) => {
   return (
     <form onSubmit={handleSubmit}>
       <TextField
-        label="Tiểu sử"
+        label="Bio"
         name="bio"
         value={profile.bio}
         onChange={handleChange}

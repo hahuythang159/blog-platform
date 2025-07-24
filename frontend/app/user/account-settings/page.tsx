@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import { getMyProfile } from '@/app/lib/myProfileService';
-import ProfileForm from './ProfileForm';
-import DeleteAccountButton from './DeleteAccountButton';
+import ProfileForm from '../../components/user/ProfileForm';
+import DeleteAccountButton from '../../components/user/DeleteAccountButton';
 import { ProfileData } from '@/app/types';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/app/store/store';

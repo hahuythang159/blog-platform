@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setPosts } from '@/app/store/postSlice';
 import { RootState } from '@/app/store/store';
 import { Container, Typography, Button, Box, Alert, Modal, Fade, Backdrop, Snackbar } from '@mui/material';
-import FloatingSettings from '../components/user/FloatingSettings';
 import PostCard from '../components/post/PostCard';
 import { getPosts } from '../lib/postService';
 import PostCardSkeleton from '../components/skeletons/PostCardSkeleton';
@@ -95,7 +94,6 @@ const PostListPage = () => {
           : posts.map((post) => <PostCard key={post._id} post={post} />)}
       </Box>
 
-      <FloatingSettings />
     </Container>
   );
 };
