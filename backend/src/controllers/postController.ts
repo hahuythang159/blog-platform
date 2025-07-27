@@ -4,6 +4,7 @@ import Post from "../models/Post";
 import Tag from "../models/Tag";
 import slugify from "slugify";
 import mongoose from "mongoose";
+import Profile from "../models/Profile";
 
 /**
  * GET /api/posts
@@ -139,6 +140,56 @@ export const deletePost = async (req: AuthRequest, res: Response): Promise<any> 
 
         await post.deleteOne();
         res.status(200).json({ message: "Post deleted successfully" });
+    } catch (error: any) {
+        return res.status(500).json({ message: error.message || 'Internal server error' });
+    }
+};
+
+/**
+ * GET /api/posts/following
+ * Get a list of posts from users the current user is following.
+ * Optionally filters posts by a tag slug (?tag=slug).
+ * Useful for displaying a personalized feed based on following relationships.
+ */
+export const getFollowingPosts = async (req: AuthRequest, res: Response): Promise<any> => {
+    try {
+        const userId = req.user?._id;
+
+        const tagSlug = (req.query.tag as string) || null;
+        const filter: any = {};
+
+        if (tagSlug) {
+            const tag = await Tag.findOne({ slug: tagSlug }).lean();
+            if (!tag) return res.status(404).json({ message: 'Tag not found' });
+            filter.tags = tag._id;
+        }
+
+        const profile = await Profile.findOne({ user: userId }).select('following');
+        if (!profile) return res.status(404).json({ message: 'Profile not found' });
+
+        const followedUserIds = (profile.following || []).map(id => new mongoose.Types.ObjectId(id));
+
+        if (followedUserIds.length === 0) {
+            return res.json([]);
+        }
+
+        filter.author = { $in: followedUserIds };
+
+        const posts = await Post.find(filter)
+            .sort({ createdAt: -1 })
+            .select('title content author tags createdAt updatedAt')
+            .populate('author', 'username')
+            .populate('tags', 'name slug')
+            .lean();
+
+        const result = posts.map(post => {
+            if (post.author?._id) {
+                (post.author as any).avatarUrl = `/api/user/avatar/${post.author._id}`;
+            }
+            return post;
+        });
+
+        return res.json(result);
     } catch (error: any) {
         return res.status(500).json({ message: error.message || 'Internal server error' });
     }
