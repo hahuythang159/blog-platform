@@ -1,6 +1,7 @@
 import { Post } from "./post.types";
 
 export type PostState = {
-    posts: Post[];
+    allPosts: Post[]
+    followingPosts: Post[]
     post: Post | null;
 }

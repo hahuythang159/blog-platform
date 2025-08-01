@@ -114,3 +114,25 @@ export const getPostsByTagSlug = async (tagSlug: string): Promise<Post[]> => {
     const query = new URLSearchParams({ tag: tagSlug });
     return await fetcher(`posts?${query.toString()}`);
 }
+
+/**
+ * Fetch posts from users the current user is following.
+ * Requires authentication token.
+ * @returns Promise resolving to an array of posts
+ */
+export const getFollowingPosts = async (): Promise<Post[]> => {
+    const res = await rawFetcher('posts/following', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to fetch following posts');
+    }
+
+    const data = await res.json();
+    return data;
+};
