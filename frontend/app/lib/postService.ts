@@ -136,3 +136,22 @@ export const getFollowingPosts = async (): Promise<Post[]> => {
     const data = await res.json();
     return data;
 };
+
+/**
+ * Search posts by keyword query.
+ * - If no parameters provided, returns all posts sorted by creation date (newest first).
+ * - If `keyword` provided, filters posts by full-text search on title/content.
+ * - If both provided, filters by tag first, then by keyword.
+ * 
+ * @param params.keyword - Optional keyword string to search posts
+ * @returns Promise resolving to an array of posts matching criteria
+ */
+export const searchPosts = async (params: { keyword?: string }): Promise<Post[]> => {
+    const query = new URLSearchParams();
+
+    if (params.keyword) query.append('q', params.keyword);
+
+    const queryString = query.toString();
+
+    return await fetcher(`posts${queryString ? `?${queryString}` : ''}`);
+};

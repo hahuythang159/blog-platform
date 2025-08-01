@@ -8,10 +8,11 @@ import { Container, Typography, Button, Box, Alert, Modal, Fade, Backdrop, Snack
 import PostCard from '../components/post/PostCard';
 import PostCardSkeleton from '../components/skeletons/PostCardSkeleton';
 import CreatePostForm from '../components/post/CreatePostForm';
-import { getPosts, getFollowingPosts } from '../lib/postService';
+import { getPosts, getFollowingPosts, searchPosts } from '../lib/postService';
 import useLazyLoadPosts from '../hooks/useLazyLoadPosts';
 import { getToken } from '../utils/token';
 import PostsLayout from '../components/layout/PostsLayout';
+import { Post } from '../types';
 
 const PostListPage = () => {
   const dispatch = useDispatch();
@@ -21,9 +22,12 @@ const PostListPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [openForm, setOpenForm] = useState<boolean>(false);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [searchResults, setSearchResults] = useState<Post[]>([]);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
 
-  const currentPosts = tab === 'foryou' ? allPosts : followingPosts;
-  const { visibleItems, loaderRef, hasMore } = useLazyLoadPosts(currentPosts, 10, 5);
+  const displayedPosts = searchKeyword.trim() ? searchResults : (tab === 'foryou' ? allPosts : followingPosts);
+  const { visibleItems, loaderRef, hasMore } = useLazyLoadPosts(displayedPosts, 10, 5);
 
   const isAuthenticated = Boolean(getToken());
 
@@ -45,6 +49,25 @@ const PostListPage = () => {
     }
   };
 
+  const handleSearch = async (keyword: string) => {
+    setSearchKeyword(keyword);
+
+    if (!keyword.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      setIsSearching(true);
+      const results = await searchPosts({ keyword });
+      setSearchResults(results);
+    } catch (err) {
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   useEffect(() => {
     loadPosts();
   }, [dispatch]);
@@ -54,6 +77,7 @@ const PostListPage = () => {
       tab={tab}
       onTabChange={(value) => setTab(value)}
       showTabs={isAuthenticated}
+      onSearch={handleSearch}
     >
       {/* Page title */}
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
@@ -108,11 +132,11 @@ const PostListPage = () => {
 
         {/* Post list */}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          {isLoading
+          {isLoading || isSearching
             ? Array.from({ length: 3 }).map((_, i) => <PostCardSkeleton key={i} />)
             : visibleItems.map((post) => <PostCard key={post._id} post={post} />)}
 
-          {hasMore && (
+          {hasMore && !isSearching && (
             <Box ref={loaderRef} sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
               <CircularProgress />
             </Box>

@@ -5,4 +5,5 @@ export interface PostsLayoutProps {
     tab?: 'foryou' | 'following';
     onTabChange?: (value: 'foryou' | 'following') => void;
     showTabs?: boolean;
+    onSearch?: (keyword: string) => void;
 };

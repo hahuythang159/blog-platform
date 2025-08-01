@@ -1,10 +1,10 @@
 'use client';
 
-import { AppBar, Box, Container, InputBase, Toolbar, Typography, Button } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
+import { AppBar, Box, Container, Toolbar, Typography, Button } from '@mui/material';
 import { PostsLayoutProps } from '../../interfaces/postsLayoutProps';
+import SearchBar from '../post/SearchBar';
 
-export default function PostsLayout({ children, tab, onTabChange, showTabs = false }: PostsLayoutProps) {
+export default function PostsLayout({ children, tab, onTabChange, showTabs = false, onSearch }: PostsLayoutProps) {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
             <AppBar position="static" elevation={1} sx={{ backgroundColor: '#fff', color: '#000' }}>
@@ -65,10 +65,7 @@ export default function PostsLayout({ children, tab, onTabChange, showTabs = fal
                         </Box>
                     )}
 
-                    <Box sx={{ backgroundColor: '#f0f0f0', borderRadius: 2, px: 1, display: 'flex', alignItems: 'center', maxWidth: 300, width: '100%', zIndex: 1 }}>
-                        <SearchIcon />
-                        <InputBase placeholder="Search…" sx={{ ml: 1, flex: 1 }} />
-                    </Box>
+                    <SearchBar onSearch={onSearch} />
                 </Toolbar>
             </AppBar>
 
