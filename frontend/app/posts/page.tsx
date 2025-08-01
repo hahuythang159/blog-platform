@@ -11,7 +11,7 @@ import CreatePostForm from '../components/post/CreatePostForm';
 import { getPosts, getFollowingPosts } from '../lib/postService';
 import useLazyLoadPosts from '../hooks/useLazyLoadPosts';
 import { getToken } from '../utils/token';
-import PostsLayout from './PostsLayout';
+import PostsLayout from '../components/layout/PostsLayout';
 
 const PostListPage = () => {
   const dispatch = useDispatch();

@@ -2,7 +2,7 @@
 
 import { AppBar, Box, Container, InputBase, Toolbar, Typography, Button } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import { PostsLayoutProps } from '../interfaces/postsLayoutProps';
+import { PostsLayoutProps } from '../../interfaces/postsLayoutProps';
 
 export default function PostsLayout({ children, tab, onTabChange, showTabs = false }: PostsLayoutProps) {
     return (
