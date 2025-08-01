@@ -24,5 +24,6 @@ const PostSchema = new Schema<IPost>(
 )
 applyPostVirtuals(PostSchema);
 applyPostCascadeDelete(PostSchema);
+PostSchema.index({ title: "text", content: "text" });
 
 export default mongoose.model<IPost>("Post", PostSchema);

@@ -8,12 +8,31 @@ import Profile from "../models/Profile";
 
 /**
  * GET /api/posts
- * Get a list of posts, optionally filtered by tag.
- * Useful for displaying the main blog feed or tag-specific results.
+ *
+ * Description:
+ * Fetch a list of blog posts from the server. 
+ * 
+ * Optional Query Parameters:
+ * - tag (string): Filter posts by a specific tag's slug. 
+ *   When provided, the API returns only posts that are associated with the given tag.
+ *   If the tag does not exist, the API returns a 404 error.
+ *
+ * - q (string): Search keyword to filter posts by matching text in the post's title or content.
+ *   The search is performed using a full-text search, and results are ranked by relevance.
+ *
+ * Usage:
+ * - If neither `tag` nor `q` is provided, all posts are returned sorted by creation date (newest first).
+ * - If both `tag` and `q` are provided, posts are filtered by the tag first, then searched by the keyword.
+ *
+ * Response:
+ * - 200 OK: Returns an array of posts matching the filter/search criteria.
+ * - 404 Not Found: Returned if the specified tag slug does not exist.
+ * - 500 Internal Server Error: Returned on unexpected server errors.
  */
 export const getPosts = async (req: AuthRequest, res: Response): Promise<any> => {
     try {
         const tagSlug = (req.query.tag as string) || null;
+        const keyword = (req.query.q as string) || null;
         let filter: any = {};
 
         if (tagSlug) {
@@ -22,12 +41,18 @@ export const getPosts = async (req: AuthRequest, res: Response): Promise<any> =>
             filter.tags = tag._id;
         }
 
-        const posts = await Post.find(filter)
-            .sort({ createdAt: -1 })
+        // Search by keyword (title/content)
+        if (keyword) {
+            filter.$text = { $search: keyword };
+        }
+
+        const posts = await Post.find(filter, keyword ? { score: { $meta: "textScore" } } : {})
+            .sort(keyword ? { score: { $meta: "textScore" } } : { createdAt: -1 })
             .select('title content author tags createdAt updatedAt')
             .populate('author', 'username')
             .populate('tags', 'name slug')
             .lean();
+
 
         const result = posts.map(post => {
             if (post.author?._id) {
