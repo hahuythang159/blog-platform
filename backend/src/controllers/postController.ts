@@ -124,14 +124,14 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<any> 
 
 /**
  * PUT /api/posts/:id
- * Update an existing post (title and content).
+ * Update an existing post (title, content and tags).
  * Only the author of the post can update it.
  */
 export const updatePost = async (req: AuthRequest, res: Response): Promise<any> => {
     try {
         if (!req.user) return res.status(401).json({ message: "The user is not logged in" });
 
-        const { title, content } = req.body;
+        const { title, content, tags = [] } = req.body;
         if (!title || !content) return res.status(400).json({ message: "Title and content are required" });
 
         const post = await Post.findById(req.params.id);
@@ -139,8 +139,18 @@ export const updatePost = async (req: AuthRequest, res: Response): Promise<any> 
 
         if (post.author.toString() !== req.user.id) res.status(403).json({ message: "Forbidden" });
 
+        const tagIds: mongoose.Types.ObjectId[] = [];
+        for (let raw of tags) {
+            const name = String(raw).trim().toLowerCase();
+            const slug = slugify(name, { lower: true });
+            let tag = await Tag.findOne({ slug });
+            if (!tag) tag = await Tag.create({ name, slug });
+            tagIds.push(tag._id as mongoose.Types.ObjectId);
+        }
+
         post.title = title;
         post.content = content;
+        post.tags = tagIds;
         await post.save();
 
         res.json(post);
