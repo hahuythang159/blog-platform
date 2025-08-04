@@ -1,19 +1,26 @@
 import React, { useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Divider, Snackbar, Alert } from '@mui/material';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
-import { deleteComment, createComment } from '../../lib/commentsService';
-import { CommentListProps } from '../../interfaces/commentListProps';
+import { RootState } from '@/app/store/store';
+import { deleteComment, createComment } from '@/app/lib/commentsService';
+import { CommentListProps } from '@/app/interfaces/commentListProps';
 import { Comment } from '@/app/types';
 import { useAvatarUrls } from '@/app/hooks/useAvatarUrls';
 import CommentItem from './CommentItem';
 import CommentForm from './CommentForm';
+import Slide from '@mui/material/Slide';
+import useLazyLoadPosts from '@/app/hooks/useLazyLoadPosts';
 
 const CommentList: React.FC<CommentListProps> = ({ comments, postId, onAdd, onDelete }) => {
   const user = useSelector((state: RootState) => state.user.user);
   const currentUserId = user?._id;
   const [loading, setLoading] = useState(false);
   const avatarUrls = useAvatarUrls(comments);
+  const [newlyAddedId, setNewlyAddedId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+
+  const { visibleItems, loaderRef, hasMore } = useLazyLoadPosts(comments);
 
   const handleDelete = async (commentId: string) => {
     if (!user?.token) {
@@ -27,8 +34,9 @@ const CommentList: React.FC<CommentListProps> = ({ comments, postId, onAdd, onDe
     try {
       await deleteComment(commentId, user.token);
       onDelete(commentId);
-    } catch (error: any) {
-      alert(error.message || 'Failed to delete comment');
+    } catch (err: any) {
+      setError(err?.message || 'Failed to delete comment.');
+      setOpenSnackbar(true);
     }
   };
 
@@ -41,36 +49,61 @@ const CommentList: React.FC<CommentListProps> = ({ comments, postId, onAdd, onDe
     setLoading(true);
     try {
       const newComment: Comment = await createComment({ postId, content });
+      setNewlyAddedId(newComment._id);
       onAdd(newComment);
-    } catch (error: any) {
-      alert(error.message || 'Failed to post comment');
+      setTimeout(() => setNewlyAddedId(null), 300);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to post comment');
+      setOpenSnackbar(true);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Box>
-      <Typography variant="h6" sx={{ mb: 2 }}>Comments</Typography>
+    <Box mt={2}>
+      {/* Comment Input */}
+      <CommentForm onSubmit={handleAdd} isLoading={loading} postId={postId} />
 
-      {comments.length === 0 ? (
-        <Typography variant="body2" color="textSecondary">
-          No comments yet.
+      <Divider sx={{ my: 3 }} />
+
+      {/* Comment List */}
+      {visibleItems.length === 0 ? (
+        <Typography variant="body2" color="text.secondary">
+          No comments yet. Be the first to reply!
         </Typography>
       ) : (
-        comments.map((comment) => (
-          <CommentItem
+        visibleItems.map((comment) => (
+          <Slide
             key={comment._id}
-            comment={comment}
-            avatarUrl={avatarUrls[comment.author._id] || ''}
-            isLoading={false}
-            onDelete={handleDelete}
-            currentUserId={currentUserId}
-          />
+            direction="up"
+            in={true}
+            timeout={comment._id === newlyAddedId ? 300 : 0}
+          >
+            <div>
+              <CommentItem
+                comment={comment}
+                avatarUrl={avatarUrls[comment.author._id] || ''}
+                isLoading={false}
+                onDelete={handleDelete}
+                currentUserId={currentUserId}
+              />
+            </div>
+          </Slide>
         ))
       )}
 
-      <CommentForm onSubmit={handleAdd} isLoading={loading} postId={postId} />
+      {/* Lazy loader trigger */}
+      {hasMore && (
+        <Box ref={loaderRef} sx={{ height: 1 }} />
+      )}
+
+      <Snackbar open={openSnackbar} onClose={() => setOpenSnackbar(false)} autoHideDuration={6000} anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
+        <Alert severity="error" sx={{ width: '100%' }}>
+          {error}
+        </Alert>
+      </Snackbar>
+      
     </Box>
   );
 };

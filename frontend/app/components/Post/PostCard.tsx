@@ -58,14 +58,16 @@ const PostCard = ({ post }: { post: any }) => {
             <CardContent sx={{ cursor: 'pointer' }} onClick={handleNavigateToPost}>
                 <Typography
                     variant="h6"
-                    sx={{ fontWeight: 600, marginBottom: 1, fontSize: '1.2rem', lineHeight: 1.4 }}
-                >
+                    sx={{ fontWeight: 600, marginBottom: 1, fontSize: '1.2rem', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }} >
                     {post.title}
                 </Typography>
 
-                <Typography variant="body2" color="text.secondary">
-                    {post.content.length > 100 ? post.content.slice(0, 100) + '...' : post.content}
+                <Typography variant="body2" color="text.secondary"
+                    sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', }}
+                >
+                    {post.content}
                 </Typography>
+
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2, maxWidth: '100%' }}>
                     {post.tags?.map((tag: any) => (
                         <Chip

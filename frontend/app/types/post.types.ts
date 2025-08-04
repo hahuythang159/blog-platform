@@ -7,6 +7,7 @@ export type Post = {
   content: string;
   tags?: Tag[];
   author: {
+    _id: string;
     username: string;
     avatarUrl: string;
   };
