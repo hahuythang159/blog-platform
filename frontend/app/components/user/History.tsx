@@ -29,7 +29,6 @@ const UserActivityHistory = () => {
 
     if (loading) return <CircularProgress />;
     if (error) return <Typography color="error">{error}</Typography>;
-    if (filtered.length === 0) return <Typography>No activity.</Typography>;
 
     return (
         <Box>
@@ -48,29 +47,32 @@ const UserActivityHistory = () => {
                 ))}
             </Tabs>
 
-            {filtered.map((interaction) => (
-                <Box
-                    key={interaction._id}
-                    mb={2}
-                    p={2}
-                    borderRadius={2}
-                    sx={{
-                        border: (theme) => `1px solid ${theme.palette.divider}`,
-                        backgroundColor: (theme) => theme.palette.background.paper,
-                    }}
-                >
-
-                    <Typography variant="body1">
-                        <strong>{typeLabels[interaction.type]}</strong> -{' '}
-                        <MuiLink component={Link} href={`/posts/${interaction.post._id}`}>
-                            {interaction.post.title}
-                        </MuiLink>
-                    </Typography>
-                    <Typography variant="caption" color="textSecondary">
-                        {new Date(interaction.createdAt).toLocaleString()}
-                    </Typography>
-                </Box>
-            ))}
+            {filtered.length === 0 ? (
+                <Typography>No activity.</Typography>
+            ) : (
+                filtered.map((interaction) => (
+                    <Box
+                        key={interaction._id}
+                        mb={2}
+                        p={2}
+                        borderRadius={2}
+                        sx={{
+                            border: (theme) => `1px solid ${theme.palette.divider}`,
+                            backgroundColor: (theme) => theme.palette.background.paper,
+                        }}
+                    >
+                        <Typography variant="body1">
+                            <strong>{typeLabels[interaction.type]}</strong> -{' '}
+                            <MuiLink component={Link} href={`/posts/${interaction.post._id}`}>
+                                {interaction.post.title}
+                            </MuiLink>
+                        </Typography>
+                        <Typography variant="caption" color="textSecondary">
+                            {new Date(interaction.createdAt).toLocaleString()}
+                        </Typography>
+                    </Box>
+                ))
+            )}
         </Box>
     );
 };
