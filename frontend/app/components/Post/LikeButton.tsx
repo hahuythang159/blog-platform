@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { IconButton, Typography } from '@mui/material';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
@@ -15,8 +15,13 @@ const LikeButton = ({ postId, likedBy, setStats }: LikeButtonProps) => {
     const { toggleLike, isLiking } = useToggleLike(postId, user?.token || '');
     const [showPrompt, setShowPrompt] = useState(false);
     const { triggerInteraction } = useRecordInteraction();
+    const [localLikedBy, setLocalLikedBy] = useState<string[]>(likedBy || []);
 
-    const isLiked = likedBy?.some(u => u._id === user?._id);
+    useEffect(() => {
+        setLocalLikedBy(likedBy || []);
+    }, [likedBy]);
+
+    const isLiked = localLikedBy?.some((u) => u === user?._id);
 
     const handleClick = async () => {
         if (!user) {
@@ -26,6 +31,7 @@ const LikeButton = ({ postId, likedBy, setStats }: LikeButtonProps) => {
         const updated = await toggleLike();
         if (updated) {
             setStats(updated)
+            setLocalLikedBy(updated.likes);
             await triggerInteraction(postId, 'like')
         }
     };
