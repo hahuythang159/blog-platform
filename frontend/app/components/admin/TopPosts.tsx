@@ -10,7 +10,7 @@ const TopPosts = ({ posts }: TopPostsProps) => {
             <Stack spacing={2}>
                 {posts.map((post, index) => (
                     <Paper
-                        key={post._id || `fallback-${index}`}
+                        key={post.postId || `fallback-${index}`}
                         elevation={2}
                         sx={{
                             p: 2,
@@ -23,7 +23,7 @@ const TopPosts = ({ posts }: TopPostsProps) => {
                             #{index + 1} — {post.title}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Author: {post.author.username} • Views: {post.views} • Likes: {post.likes}
+                            Author: {post.author} • Views: {post.views} • Likes: {post.likes}
                         </Typography>
                     </Paper>
                 ))}
